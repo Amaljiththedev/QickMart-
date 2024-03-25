@@ -42,6 +42,12 @@ INSTALLED_APPS = [
     'admin_auth',
     'category',
     'products',
+    'registration',
+    'banner', 
+    'user_profile',
+    'inventory',
+    'ckeditor',
+    
 ]
 
 MIDDLEWARE = [
@@ -81,7 +87,7 @@ WSGI_APPLICATION = 'Qickmart.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'Qickmart', 
+        'NAME': 'Ecommerce', 
         'USER': 'postgres',
         'PASSWORD': '7025',
         'HOST': '127.0.0.1', 
@@ -144,3 +150,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL='/media/'
 MEDIA_ROOT=os.path.join(BASE_DIR, 'media')
+
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline', 'Strike'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
+            ['Link', 'Unlink', 'Anchor'],
+            ['RemoveFormat', 'Source']
+        ],
+        'width': '100%',
+    },
+}

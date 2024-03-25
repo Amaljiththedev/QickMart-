@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class category(models.Model):
-    name = models.CharField(max_length=255,blank=False,null=True)
+    name = models.CharField(max_length=255,blank=False,null=True,unique=True)
     image=models.ImageField(upload_to="category_media", blank=True)
     description=models.TextField(null=False,blank=False)
     category_offer_description=models.TextField(blank=True,null=True)
@@ -19,3 +19,4 @@ class Brand(models.Model):
     
     def __str__(self):
         return self.brand_name
+

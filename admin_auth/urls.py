@@ -3,7 +3,10 @@ from django.urls import path,include
 from .views import *
 from category import views as category_views
 from products import views as products_views
+from inventory import views as stock_management
+
 urlpatterns = [
+
     path('',admin_login,name='admin_login'),
     path('dashboard/',dashboard,name='dashboard'),
     path('usermanagement/',User_management,name='user_management'),
@@ -23,5 +26,25 @@ urlpatterns = [
     path('block_product/<int:id>/',products_views.block_product,name='block_product'),
     path('unblock_product/<int:id>/',products_views.unblock_product,name='unblock_product'),
     path('delete_product/<int:id>/',products_views.delete_product,name='delete_product'),
+    path('add-variant/<int:product_id>/', products_views.add_variant, name='add_variant'),
+    path('logout/',admin_logout,name='logout'),  
+    path('delete_user/<int:id>/',delete_user,name='delete_user'),
+    path('banner_management/',category_views.banner_management,name='banner_management'),
+    path('add_banner/',category_views.add_banner,name='add_banner'),
+    path('update_banner/<int:id>',category_views.update_banner,name='update_banner'),
+    path('delete_banner/<int:id>',category_views.delete_banner,name='delete_banner'),
+    path('block_banner/<int:id>',category_views.block_banner,name='block_banner '),
+    path('unblock_banner/<int:id>',category_views.unblock_banner,name='unblock_banner'),
+    path('stock/', stock_management. stock_management, name='stock_management'),
+    path('update-stock/', stock_management.update_stock, name='update_stock'),
+    path('ordermanagement/', stock_management.order_management, name='order_management'),
+     path('update_status/<int:order_id>/', stock_management.update_status, name='update_status'),
+    path('variant_management/', products_views.variant_management, name='variant'),
+    path('edit-variant/<int:variant_id>/', products_views.edit_variant, name='edit_variant'),
+    path('delete-variant/<int:variant_id>/', products_views.delete_variant, name='delete_variant'),
+    path('block-variant/<int:variant_id>/', products_views.block_variant, name='block_variant'),
+    path('unblock-variant/<int:variant_id>/', products_views.unblock_variant, name='unblock_variant'),
+    
     
 ]
+ 

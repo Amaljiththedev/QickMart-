@@ -1,54 +1,58 @@
 from django.shortcuts import redirect, render
 from .models import *
 from admin_auth import views 
+from category.models import category as Category
+from banner.models import Banner
+from products.models import Products
 
 # Create your views here.
 
 
 def category_list(request):
-    
-    cat=category.objects.all()
-    
-    context={
-        'cat':cat,
-    }
-    return render(request, 'admin_auth/category.html', context)
+    if 'email' in request.session:
+        cat=category.objects.all()
+        context={
+            'cat':cat,
+            }
+        return render(request, 'admin_auth/category.html', context)
+    return render(request,'admin_auth/authentication-login.html')
     
     
 def add_category(request):
     
+    if 'email' in request.session:
+        if request.method == 'POST':
+            name=request.POST.get('name')
+            description=request.POST.get('description')
+            image = request.FILES.get('image')
+            category_offer_description=request.POST.get('category_offer_description')
+            category_offer=request.POST.get('category_offer')
+            
+            new_category=category(
+                name=name,
+                description=description,
+                image=image,
+                category_offer_description=category_offer_description,
+                category_offer=category_offer
+                )
+            new_category.save()
+            return redirect('category')
     
-    if request.method == 'POST':
-        name=request.POST.get('name')
-        description=request.POST.get('description')
-        image = request.FILES.get('image')
-        category_offer_description=request.POST.get('category_offer_description')
-        category_offer=request.POST.get('category_offer')
-    
-        new_category=category(
-            name=name,
-            description=description,
-            image=image,
-            category_offer_description=category_offer_description,
-            category_offer=category_offer
-        )
-    
-        new_category.save()
-        return redirect('category')
-    return render(request, 'admin_auth/add_category.html')
-    
+        return render(request, 'admin_auth/add_category.html')
+    return render(request,'admin_auth/authentication-login.html')
     
 def delete_category(request,id):
-    cat=category.objects.get(id=id)
-    cat.delete()
-    return redirect('category')
+    if 'email' in request.session:
+        cat=category.objects.get(id=id)
+        cat.delete()
+        return redirect('category')
     
 
 
 def edit_category(request,id):
-    
-    cat=category.objects.get(id=id)
-    if request.method=='POST':
+    if 'email' in request.session:
+        cat=category.objects.get(id=id)
+        if request.method=='POST':
             name=request.POST.get('name')
             description=request.POST.get('description')
             image = request.FILES.get('image')
@@ -67,35 +71,137 @@ def edit_category(request,id):
             
             return redirect('category')
             
-    context={
+        context={
             'cat':cat,
             }    
-        
-    return render(request, 'admin_auth/edit_category.html',context)
+        return render(request, 'admin_auth/edit_category.html',context)
+    return render(request,'admin_auth/authentication-login.html')
+    
 
 
 
 def block_category(request,id):
-    cat=category.objects.get(id=id)
-    cat.is_active=False
-    cat.save()
-    
-    return redirect('category')
-    
-def unblock_category(request,id):
-    cat=category.objects.get(id=id)
-    cat.is_active=True
-    cat.save()
-    
-    return redirect('category')
-
-def add_brand(request):
-    
-    if request.method == 'POST':
-        brand=request.POST.get('brand')
-        logo=request.FILES.get('logo')
-        
-        new_brand=Brand.objects.create(brand_name=brand,logo=logo)
+    if 'email' in request.session:
+        cat=category.objects.get(id=id)
+        cat.is_active=False
+        cat.save()
         return redirect('category')
     
-    return render(request, 'admin_auth/add_brand.html')
+def unblock_category(request,id):
+    if 'email' in request.session:
+        cat=category.objects.get(id=id)
+        cat.is_active=True
+        cat.save()
+        return redirect('category')
+    else:
+        return render(request,'admin_auth/authentication-login.html')
+        
+def add_brand(request):
+    if 'email' in request.session:
+        if request.method == 'POST':
+            brand=request.POST.get('brand')
+            logo=request.FILES.get('logo')
+            new_brand=Brand.objects.create(brand_name=brand,logo=logo)
+            return redirect('category')
+        return render(request, 'admin_auth/add_brand.html')
+    else:
+        return render(request,'admin_auth/authentication-login.html')
+    
+def banner_management(request):
+    if 'email' in request.session:
+        banner=Banner.objects.all()
+    
+        context={
+            'banner': banner,
+        }
+        return render(request, 'admin_auth/banner_management.html',context)
+    else:
+        return render(request,'admin_auth/authentication-login.html')
+
+def add_banner(request):
+    if 'email' in request.session:
+        categories = Category.objects.all()
+        context = {
+            'categories': categories
+        }
+        if request.method == 'POST':
+            title = request.POST.get('title')
+            cat_id = request.POST.get('category')
+            image = request.FILES.get('image')
+            price=request.POST.get('price')
+            offer_details=request.POST('offer_details')
+            
+            # Check if all required data is provided
+            if title and category and image:
+                cat=Category.objects.get(id=cat_id)
+                banner = Banner.objects.create(title=title, category=cat, image=image,price=price,offer_details=offer_details)
+                return redirect('banner_management')
+            else:
+                # Handle invalid or incomplete form submission
+                context['error_message'] = "Please provide all required information."
+                
+        # If the request is not a POST request or form submission failed, render the form again
+        return render(request, 'admin_auth/add_banner.html', context)
+    # If user is not logged in, redirect them to login page or handle as appropriate
+    return redirect('login_page')
+
+    
+    
+    
+    
+    
+def update_banner(request,id):
+    if 'email' in request.session:
+        banner=Banner.objects.get(id=id)
+        
+        context={
+            'banner':banner,
+        }
+        if request.method=='POST':
+            title=request.POST.get('title')
+            cat_id=request.POST.get('cat_id')
+            image=request.POST.get('image')
+            price=request.POST.get('price')
+            offer_details=request.POST('offer_details')
+        
+        
+            banner.title=title
+            banner.category=Category.objects.get(id=cat_id)
+            banner.image=image
+            banner.price=price
+            banner.offer_details=offer_details
+        
+            banner.save()
+            return redirect('banner_management')
+        
+        return render(request, 'admin_auth/add_banner.html',context)
+    return redirect('login_page')  
+    
+def delete_banner(request,id):
+     if 'email' in request.session:
+        banner= Banner.objects.get(id=id)
+        banner.delete()
+        return redirect('banner_management')  
+    
+    
+def block_banner(request,id):
+    if 'email' in request.session:
+        banner= Banner.objects.get(id=id)
+        banner.is_active=False
+        banner.save()
+        return redirect('banner_management')  
+
+def unblock_banner(request,id):
+    if 'email' in request.session:
+        banner= Banner.objects.get(id=id)
+        banner.is_active=False
+        banner.save()
+        return redirect('banner_management')  
+    
+def inventory(request):
+    stock_items=Products.objects.all()
+    
+    context={
+        'stock_items': stock_items
+    }
+    return render(request, 'admin_auth/inventory.html',context)
