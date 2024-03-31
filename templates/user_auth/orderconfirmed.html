@@ -1,0 +1,37 @@
+
+{%extends 'user_auth/base.html'%}
+{%block content%}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Order Confirmation</div>
+
+                <div class="card-body">
+                    <p>Your order has been successfully placed!</p>
+                    <p>Order ID: {{ order.id }}</p>
+                    <p><strong>Order Summary:</strong></p>
+                    <ul>
+                        {% for item in order_items %}
+                            <li>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="img-fluid">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <p><strong>{{ item.product.brand }}</strong></p>
+                                        <p>{{ item.product.title }}</p>
+                                        <p>Quantity: {{ item.quantity }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <!-- You can include additional details such as delivery information, total amount, etc. -->
+                    <p><a href="{% url 'user_profile:user_orders' %}" class="btn btn-primary">View Orders</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

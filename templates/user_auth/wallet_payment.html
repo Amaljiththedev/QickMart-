@@ -1,0 +1,62 @@
+{% extends 'user_auth/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Order Confirmation</div>
+
+                <div class="card-body">
+                    <p>Your order has been successfully placed!</p>
+                    <p>Order ID: {{ order.id }}</p>
+                    <p><strong>Order Summary:</strong></p>
+                    <ul>
+                        {% for item in order_items %}
+                            <li>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="img-fluid">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <p><strong>{{ item.product.brand }}</strong></p>
+                                        <p>{{ item.product.title }}</p>
+                                        <p>Quantity: {{ item.quantity }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <!-- Display wallet balance and amount paid -->
+                    <p><strong>Wallet Balance:</strong> ₹{{ wallet_balance }}</p>
+                    <p><strong>Amount Paid:</strong> ₹{{ order.total_price }}</p>
+
+                    <!-- Submit button to confirm the order -->
+                    <form id="confirmOrderForm" method="POST" action="{% url 'user_profile:user_orders' %}">
+                        {% csrf_token %}
+                        <button type="button" onclick="validateAndSubmit()" class="btn btn-primary">Confirm Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    function validateAndSubmit() {
+        // Check wallet balance and total price
+        var walletBalance = {{ wallet_balance }};
+        var totalPrice = {{ order.total_price }};
+
+        if (walletBalance >= totalPrice && walletBalance > 0) {
+            document.getElementById('confirmOrderForm').submit(); // Submit the form
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Insufficient Funds",
+                text: "You don't have sufficient funds in your wallet to complete this order."
+            });
+        }
+    }
+</script>
+{% endblock %}

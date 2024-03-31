@@ -8,6 +8,12 @@
   <title>Modernize Free</title>
   <link rel="shortcut icon" type="image/png" href="{% static 'assets/admin_auth/images/logos/favicon.png' %}" />
   <link rel="stylesheet" href="{% static 'assets/admin_auth/css/styles.min.css' %}" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .error {
+        color: red;
+    }
+</style>
 </head>
 
 <body>
@@ -112,6 +118,24 @@
       </div>
     </div>
   </div>
+  <script>
+    function validateForm() {
+        var name = document.getElementById("name").value.trim();
+        var description = document.getElementById("description").value.trim();
+
+        if (name === "" || description === "") {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Please fill in all fields!",
+                footer: '<a href="#">Why do I have this issue?</a>'
+            });
+            return;
+        }
+
+        document.getElementById("add-category-form").submit();
+    }
+</script> 
   <script src="{% static 'assets/admin_auth/libs/jquery/dist/jquery.min.js' %}"></script>
   <script src="{% static 'assets/admin_auth/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'assets/admin_auth/js/sidebarmenu.js' %}"></script>

@@ -165,3 +165,7 @@ CKEDITOR_CONFIGS = {
         'width': '100%',
     },
 }
+
+RAZORPAY_KEY_ID='rzp_test_O8M2AeQbEM5Mcp'
+RAZORPAY_SECRET_KEY='Nxelb4U3Kinhwoivpb8TawsC'
+

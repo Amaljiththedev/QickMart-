@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Order Details</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include jQuery UI Datepicker library -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>Update Order Details</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="estimated_delivery_time">Estimated Delivery Time:</label>
+        <input type="text" id="estimated_delivery_time" name="estimated_delivery_time" value="{{ order.estimated_delivery_time }}" required><br><br>
+        
+        <label for="status">Status:</label>
+        <input type="text" id="status" name="status" value="{{ order.status }}" disabled><br><br>
+        
+        <label for="tracking_number">Tracking Number:</label>
+        <input type="text" id="tracking_number" name="tracking_number" value="{{ order.tracking_number }}" required><br><br>
+        
+        <button type="submit">Update Order</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize date picker
+            $("#estimated_delivery_time").datepicker({
+                dateFormat: 'yy-mm-dd', // Format of the date
+                defaultDate: '2024-01-01', // Default date (2024-01-01)
+                changeMonth: true, // Allow changing month
+                changeYear: true // Allow changing year
+            });
+        });
+    </script>
+</body>
+</html>

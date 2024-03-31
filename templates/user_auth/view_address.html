@@ -1,0 +1,40 @@
+{% extends 'user_auth/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">View Address</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Address Details</h2>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>House Name:</strong> {{ address.house_name }}</li>
+                        <li class="list-group-item"><strong>Street:</strong> {{ address.street }}</li>
+                        <li class="list-group-item"><strong>City:</strong> {{ address.city }}</li>
+                        <li class="list-group-item"><strong>State:</strong> {{ address.state }}</li>
+                        <li class="list-group-item"><strong>ZIP Code:</strong> {{ address.zipcode }}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="{% url 'user_profile:edit_address' address.id %}" class="btn btn-primary me-2"><i class="bi bi-pencil"></i> Edit</a>
+                <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i> Delete</button>
+                <a href="{% url 'user_profile:manage_address' %}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

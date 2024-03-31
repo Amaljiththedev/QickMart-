@@ -1,0 +1,55 @@
+{% extends 'user_auth/base.html' %}
+
+{% block content %}
+{%load static%}
+
+<!-- Li's Breadcrumb Area End Here -->
+<!--Wishlist Area Strat-->
+<div class="wishlist-area pt-60 pb-60">
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <form action="#">
+                <div class="table-content table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="li-product-remove">remove</th>
+                                <th class="li-product-thumbnail">images</th>
+                                <th class="cart-product-name">Product</th>
+                                <th class="li-product-price">Unit Price</th>
+                                <th class="li-product-stock-status">Stock Status</th>
+                                <th class="li-product-add-cart">add to cart</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in wishlist_items %}
+                        <tr>
+                        <td class="li-product-remove"><a href="#"><i class="fa fa-times"></i></a></td>
+                        <td class="li-product-thumbnail"><a href="#"><img src="{{ item.product.image.url }}" alt=""></a></td>
+                        <td class="li-product-name"><a href="#">{{ item.product.title }}</a></td>
+                        <td class="li-product-price"><span class="amount">${{ item.product.price }}</span></td>
+                        <td class="li-product-stock-status">
+                            {% if item.product.stock_count == 0 %}
+                                <span class="out-of-stock">Out of stock</span>
+                            {% else %}
+                                <span class="in-stock">In stock</span>
+                            {% endif %}
+                        </td>
+                        <td class="li-product-add-cart"><a href="#">add to cart</a></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+<!--Wishlist Area End-->
+<!-- Begin Footer Area -->
+
+
+
+{%endblock%}

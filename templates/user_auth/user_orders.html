@@ -1,0 +1,127 @@
+{% extends 'user_auth/base.html' %}
+{% load static %}
+
+<!-- Include Bootstrap CSS from CDN -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<!-- Include SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@10" rel="stylesheet">
+
+<style>
+    /* Custom styles */
+    .img-thumbnail {
+        max-width: 100px;
+        max-height: 100px;
+    }
+    .table th,
+    .table td {
+        vertical-align: middle;
+    }
+    .cancel-btn {
+        margin-top: 5px;
+    }
+</style>
+
+{% block content %}
+    <div class="content">
+        <div class="row">
+            <div class="col-sm-4 col-3">
+                <h4 class="page-title">Order List</h4>
+            </div>
+        </div>
+        <p class="lead">All product orders are listed here. You can manage your orders from this page.</p>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="text-center">Date</th>
+                                <th scope="col" class="text-center">Image</th>
+                                <th scope="col" class="text-center">Product</th>
+                                <th scope="col" class="text-center">Total Price</th>
+                                <th scope="col" class="text-center">Payment Method</th>
+                                <th scope="col" class="text-center">Status</th>
+                                <th scope="col" class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td class="text-center">{{ order.created_at }}</td>
+                                    <td style="width: 150px; height: 100px;" class="text-center">
+                                        {% for order_item in order.orderitem_set.all %}
+                                            {% if order_item.product.image %}
+                                                <img src="{{ order_item.product.image.url }}" alt="Product Image" class="img-thumbnail">
+                                            {% else %}
+                                                <p>No image available</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>   
+                                    <td class="text-center">
+                                        {% for order_item in order.orderitem_set.all %}
+                                            {{ order_item.product.brand }},{{ order_item.product.title|truncatewords:2 }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td class="text-center">₹{{ order.total_price }}</td>
+                                    <td class="text-center">{{ order.payment_method }}</td>
+                                    <td class="text-center">{{ order.status }}</td>
+                                    <td class="text-center">
+                                    {% if order.status == 'Pending' or order.status == 'Processing' %}
+                                        <button type="button" class="btn btn-danger cancel-btn" data-order-id="{{ order.id }}">Cancel</button>
+                                    {% elif order.status == 'Delivered' %}
+                                        <button type="button" class="btn btn-info cancel-btn" data-order-id="{{ order.id }}">Return Order</button>
+                                    {% elif order.status == 'Out of delivery' %}
+                                        <a href="{% url 'user_profile:track_order' %}" class="btn btn-info track_order-btn">Track Order</a>
+                                    {% elif order.status == 'Cancelled' %}
+                                        <button type="button" class="btn btn-info cancel-btn" data-order-id="{{ order.id }}">Refund Status</button>
+                                    {% elif order.status == 'Shipped' %}
+                                        <a href="{% url 'user_profile:track_order'  %}" class="btn btn-info track_order-btn">Track Order</a>
+                                    {% endif %}
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        // Create hidden form for cancel action
+        var cancelForm = document.createElement('form');
+        cancelForm.style.display = 'none';
+        document.body.appendChild(cancelForm);
+
+        // Add event listener to cancel buttons
+        document.querySelectorAll('.cancel-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var orderId = this.getAttribute('data-order-id');
+                // Show SweetAlert confirmation dialog
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This action cannot be undone!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'No, keep it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Update form attributes and submit
+                        cancelForm.setAttribute('method', 'post');
+                        cancelForm.setAttribute('action', '{% url "user_profile:cancel_order" 0 %}'.replace('0', orderId));
+                        cancelForm.innerHTML = '{% csrf_token %}';
+                        cancelForm.submit();
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

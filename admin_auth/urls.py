@@ -44,6 +44,12 @@ urlpatterns = [
     path('delete-variant/<int:variant_id>/', products_views.delete_variant, name='delete_variant'),
     path('block-variant/<int:variant_id>/', products_views.block_variant, name='block_variant'),
     path('unblock-variant/<int:variant_id>/', products_views.unblock_variant, name='unblock_variant'),
+    path('update-order/<int:order_id>/', stock_management.update_order_details, name='update_order_details'),
+    path('refund-order/<int:order_id>/', stock_management.refund_order, name='refund_order'),
+    path('coupon/', stock_management.coupon_list, name='coupon_management'),
+    path('add-coupon', stock_management.add_coupon, name='add_coupon'),
+    path('edit-coupon/<int:coupon_id>/', stock_management.edit_coupon, name='edit_coupon'),
+    path('delete-coupon/<int:coupon_id>/', stock_management.delete_coupon, name='delete_coupon'),
     
     
 ]

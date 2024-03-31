@@ -1,0 +1,204 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Modernize Free</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'assets/admin_auth/images/logos/favicon.png' %}" />
+    <link rel="stylesheet" href="{% static 'assets/admin_auth/css/styles.min.css' %}" />
+
+    <style>
+        /* Custom CSS for coupon management */
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
+
+        .table th {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar">
+        <!-- Sidebar scroll-->
+        <div>
+          <div class="brand-logo d-flex align-items-center justify-content-between">
+  
+            </a>
+            <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+              <i class="ti ti-x fs-8"></i>
+            </div>
+          </div>
+          <!-- Sidebar navigation-->
+          <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+            <ul id="sidebarnav">
+              <li class="nav-small-cap">
+                <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                <span class="hide-menu">Home</span>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="./index.html" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-layout-dashboard"></i>
+                  </span>
+                  <span class="hide-menu">Dashboard</span>
+                </a>
+              </li>
+              <li class="nav-small-cap">
+                <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                <span class="hide-menu">Section</span>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'user_management' %}" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-article"></i>
+                  </span>
+                  <span class="hide-menu">User management</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'category' %}" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-alert-circle"></i>
+                  </span>
+                  <span class="hide-menu">Categories</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'product_management' %}" aria-expanded="false">
+                  <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-producthunt" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                      <path d="M10 16v-8h2.5a2.5 2.5 0 1 1 0 5h-2.5" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /></svg>
+                  </span>
+                  <span class="hide-menu">Product Management</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'banner_management' %}" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-file-description"></i>
+                  </span>
+                  <span class="hide-menu">Banner Management</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'stock_management' %}" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-typography"></i>
+                  </span>
+                  <span class="hide-menu">Stock Management</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'order_management' %}" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-typography"></i>
+                  </span>
+                  <span class="hide-menu">Order Management</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'variant' %}" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-typography"></i>
+                  </span>
+                  <span class="hide-menu">Variant Management</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'coupon_management' %}" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-typography"></i>
+                  </span>
+                  <span class="hide-menu">Coupon Management</span>
+                </a>
+              </li>
+              <li class="nav-small-cap">
+                <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                <span class="hide-menu">Logout</span>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'logout' %}" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-login"></i>
+                  </span>
+                  <span class="hide-menu">Logout</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <!-- End Sidebar navigation -->
+        </div>
+        <!-- End Sidebar scroll-->
+      </aside>
+    <!-- Sidebar End -->
+
+    <!-- Main wrapper -->
+    <div class="body-wrapper">
+        <!-- Header Start -->
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title fw-semibold mb-4">Coupon Management</h5>
+                    <div class="container-fluid">
+                        <div class="row justify-content-end">
+                            <!-- Add "Add" button -->
+                            <div class="col-auto">
+                                <a href="{% url 'add_coupon' %}" class="btn btn-primary">Add Coupon</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body p-4">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Coupon Code</th>
+                                    <th>Discount Type</th>
+                                    <th>Discount Value</th>
+                                    <th>Min Order Value</th>
+                                    <th>Expiration Date</th>
+                                    <th>Max Uses</th>
+                                    <th>Used Count</th>
+                                    <th>Actions</th> <!-- New column for edit button -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for coupon in coupons %}
+                                <tr>
+                                    <td>{{ coupon.code }}</td>
+                                    <td>{{ coupon.discount_type }}</td>
+                                    <td>{{ coupon.discount_value }}</td>
+                                    <td>{{ coupon.min_order_value }}</td>
+                                    <td>{{ coupon.expiration_date }}</td>
+                                    <td>{{ coupon.max_uses }}</td>
+                                    <td>{{ coupon.used_count }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_coupon' coupon.id %}" class="btn btn-info">Edit</a>
+                                        <a href="{% url 'delete_coupon' coupon.id %}" class="btn btn-danger">Delete</a>
+                                        <!-- Edit button -->
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Header -->
+    </div>
+    <!-- End Main wrapper -->
+
+    <!-- Include necessary JavaScript files -->
+    <script src="{% static 'assets/admin_auth/libs/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/admin_auth/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+
+</html>

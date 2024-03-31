@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Variant</title>
+</head>
+<body>
+    <h1>Edit Variant</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="size">Size:</label>
+        <input type="text" id="size" name="size" value="{{ variant_product.size }}"><br>
+        
+        <label for="color">Color:</label>
+        <input type="text" id="color" name="color" value="{{ variant_product.color }}"><br>
+        
+        <label for="price">Price:</label>
+        <input type="text" id="price" name="price" value="{{ variant_product.price }}"><br>
+        
+        <label for="stock_count">Stock Count:</label>
+        <input type="text" id="stock_count" name="stock_count" value="{{ variant_product.stock_count }}"><br>
+        
+        <label for="images">Images:</label><br>
+        {% for image in variant_product.variant_images.all %}
+            <img src="{{ image.image.url }}" alt="Variant Image" width="100"><br>
+        {% endfor %}
+        <input type="file" id="images" name="images" multiple><br>
+        
+        <input type="submit" value="Save Changes">
+    </form>
+</body>
+</html>

@@ -1,0 +1,94 @@
+{% extends 'user_auth/base.html' %}
+
+{% block content %}
+{%load static%}
+<style>
+    .container {
+        margin-top: 30px;
+    }
+
+    .profile-img img {
+
+        border-radius: 50%; /* Makes the image round */
+    }
+
+    .btn {
+        margin-top: 10px;
+    }
+
+    .profile-head {
+        margin-top: 20px;
+    }
+
+    .profile-head h5 {
+        color: #333;
+    }
+
+    .profile-head p {
+        color: #777;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    /* Add more styles as needed */
+</style>
+<!------ Include the above in your HEAD tag ---------->
+<div class="container emp-profile">    <div class="container emp-profile">
+    <form method="post" id="userProfileForm">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" value="{{ custom_user.first_name }}">
+            </div>
+            <div class="col-md-6">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" value="{{ custom_user.last_name }}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label for="phone">Phone</label>
+                <input type="text" id="phone" name="phone" value="{{ custom_user.phone }}">
+            </div>
+        </div>
+        <!-- Add more fields as needed -->
+        <button type="button" class="btn btn-primary" onclick="validateForm()">Save Changes</button>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    function validateForm() {
+        var form = document.getElementById("userProfileForm");
+        var firstName = form.elements["first_name"].value.trim();
+        var lastName = form.elements["last_name"].value.trim();
+        var phone = form.elements["phone"].value.trim();
+
+        // Check for empty fields
+        if (firstName === "" || lastName === "" || phone === "") {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Please fill out all fields."
+            });
+            return false;
+        }
+
+        // Check for white spaces
+        if (/\s/.test(firstName) || /\s/.test(lastName) || /\s/.test(phone)) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Fields cannot contain white spaces."
+            });
+            return false;
+        }
+
+        // If all validations pass, submit the form
+        form.submit();
+    }
+</script>
+
+{% endblock %}

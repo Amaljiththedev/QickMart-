@@ -1,0 +1,108 @@
+{% extends 'user_auth/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .grand-total-label {
+        text-align: right;
+        margin-right:100px;
+    }
+    
+    .grand-total-amount {
+        text-align: center;
+    }
+</style>
+
+<!-- Check if cart is not empty before displaying checkout area -->
+{% if cart %}
+<div class="checkout-area pt-60 pb-30">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="coupon-accordion">
+                    <!-- Removed login and coupon accordion -->
+                </div>
+            </div>
+        </div>
+        <form action="{% url 'user_profile:confirm_orders' %}" method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-lg-6 col-12">
+                    <div class="checkbox-form">
+                        <input type='text' value="{{order_id}}" name="order_id" hidden/>
+                        <input type='text' value="{{payments}}" name="payments" hidden/>
+                        <h3>Billing Details</h3>
+                        <div class="country-select clearfix">
+                            <label>Select Saved Address <span class="required">*</span></label>
+                            <select class="nice-select wide" name="saved_address">
+                                {% for address in addresses %}
+                                    <option value="{{ address.id }}">{{ address.house_name }}, {{ address.street }}, {{ address.city }}, {{ address.state }} - {{ address.zipcode }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- Add New Address Button -->
+                        <div class="add-new-address">
+                            <button type="button" class="btn btn-primary" onclick="location.href='{% url 'user_profile:manage_address' %}'">Add New Address</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-12">
+                    <div class="your-order">
+                        <h3>Your order</h3>
+                        <div class="your-order-table table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="cart-product-name">Product</th>
+                                        <th class="cart-product-total">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in cart %}
+                                    <tr class="cart_item">
+                                        <td class="cart-product-name">{{ item.product.title }}</td>
+                                        <td class="cart-product-total">{{ item.total_price }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr class="cart-grand-total">
+                                        <td colspan="2">Grand Total:</td>
+                                        <td>{{ total }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="payment">
+                        <h3>Payment</h3>
+                        <div class="form-group">
+                            <label for="payment-method">Select Payment Method:</label>
+                            <select id="payment-method" class="form-control" name="payment_method">
+                                {% for key, value in payment_modes.items %}
+                                <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block mt-3">Confirm Orders</button>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <a href="{% url 'user_profile:show_cart' %}" class="btn btn-secondary btn-block mt-3">Go to Cart</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% else %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-warning" role="alert">
+                Your cart is empty. Please add some items to your cart before proceeding to checkout.
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

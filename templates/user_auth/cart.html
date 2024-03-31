@@ -1,0 +1,218 @@
+{% extends 'user_auth/base.html' %}
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Define your CSS styles here */
+        .product-image {
+            max-width: 100px; /* Set your desired max width */
+            max-height: 75px; /* Set your desired max height */
+            width: auto;
+            height: auto;
+        }
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .button:hover {
+            background-color: #45a049; /* Darker Green */
+        }
+    </style>
+</head>
+<body>
+    <!-- Li's Breadcrumb Area -->
+    <div class="breadcrumb-area">
+        <div class="container">
+            <div class="breadcrumb-content">
+                <ul>
+                    <li class="active">Shopping Cart</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Li's Breadcrumb Area End Here -->
+
+    <!-- Shopping Cart Area -->
+    <div class="Shopping-cart-area pt-20 pb-20">
+        <center>
+            <h3>My Cart</h3>
+        </center>
+        <div class="container">
+            <div class="row">
+                <div class="col-12 reload">
+                    {% if cart_items %}
+                    <div class="table-content table-responsive">
+                        <table class="table cart_data">
+                            <thead>
+                                <tr>
+                                    <th class="li-product-thumbnail">Images</th>
+                                    <th class="cart-product-name">Product</th>
+                                    <th class="li-product-price">Unit Price</th>
+                                    <th class="li-product-quantity">Quantity</th>
+                                    <th class="li-product-subtotal">Total</th>
+                                    <th class="li-product-remove">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td class="li-product-thumbnail">
+                                        <!-- Product image -->
+                                        {% if item.product.image %}
+                                        <img class="product-image" src="{{ item.product.image.url }}" alt="Product Image">
+                                        {% else %}
+                                        <span>No Image Available</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="li-product-name">{{ item.product.brand }}</td>
+                                    <td class="li-product-price">₹{{ item.product.price }}</td>
+                                    <td class="quantity tr product_data" style="text-align: center;">
+                                        <!-- Quantity input -->
+                                        <input type="hidden" value="{{ item.product_id }}" class="prod_id">
+                                        <input type="hidden" value="{{ item.product_variant_id }}" class="variant_id">
+                                        <label for="quantity">Quantity</label>
+                                    
+                                        <div class="input-group text-center mb-3" style="width: 130px; margin: auto;">
+                                            <div class="input-group-prepend">
+                                                <button class="btn btn-outline-secondary minus-btn" type="button">-</button>
+                                            </div>
+                                            <input type="number" min="1" max="{{ stock_count_plus_one }}" name="quantity" class="form-control qty-input text-center" value="{{ item.product_quantity }}">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary plus-btn" type="button">+</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="product-subtotal"><span class="amount">₹{{ item.total_price }}</span></td>
+                                    <td><a href="{% url 'user_profile:remove_cart' id=item.id %}" class="delete-item" data-id="{{ item.id }}"><i class="fa fa-times"></i></a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <form action="#" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="coupon mt-5">
+                            <input id="coupon_code" class="input-text" name="coupon_code" placeholder="Coupon code" type="text">
+                            <button type="submit" class="button" name="apply_coupon">Apply coupon</button>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-md-5 ml-auto">
+                            <div class="cart-page-total">
+                                <h2>Cart totals</h2>
+                                <ul>
+                                    <li>Subtotal <span id="subtotal">₹{{ subtotal }}</span></li>
+                                    <li>Delivery <span>₹50</span></li>
+                                    <li>Total <span id="total">₹{{ subtotal|add:50 }}</span></li>
+                                </ul>
+                                <a href="{% url 'user_profile:checkout' %}">Proceed to checkout</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <br>
+                    <br>
+                    <h4>Your cart is empty</h4>
+                    <br>
+                    <br>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            // Function to update cart item totals
+            function updateCartItem(row) {
+                var quantity = parseInt(row.find('.qty-input').val());
+                var price = parseFloat(row.find('.li-product-price').text().replace('₹', ''));
+                var subtotal = quantity * price;
+                row.find('.product-subtotal .amount').text('₹' + subtotal.toFixed(2));
+                updateCartTotals();
+                
+                // Send AJAX request to update cart quantity
+                var product_id = row.find('.prod_id').val();
+                var quantity = quantity;
+                $.ajax({
+                    url: '{% url "user_profile:update_cart_quantity" %}',
+                    method: 'POST',
+                    data: {
+                        'product_id': product_id,
+                        'quantity': quantity,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}' // Ensure to include CSRF token
+                    },
+                    success: function(response) {
+                        // Handle success response if needed
+                        console.log(response);
+                    },
+                    error: function(xhr, errmsg, err) {
+                        // Handle error response if needed
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            }
+        
+            // Function to update cart totals
+            function updateCartTotals() {
+                var subtotal = 0;
+                $('.product-subtotal .amount').each(function() {
+                    subtotal += parseFloat($(this).text().replace('₹', ''));
+                });
+                $('#subtotal').text('₹' + subtotal.toFixed(2));
+                var total = subtotal + 50; // Assuming delivery charge is ₹50
+                $('#total').text('₹' + total.toFixed(2));
+            }
+        
+            // Plus button click event
+            $('.plus-btn').click(function() {
+                var input = $(this).parent().prev('input.qty-input');
+                var currentVal = parseInt(input.val());
+                var stockCount = parseInt(input.attr('max'));
+                if (!isNaN(currentVal) && currentVal < stockCount) {
+                    input.val(currentVal + 1).change();
+                    updateCartItem($(this).closest('tr'));
+                }
+            });
+        
+            // Minus button click event
+            $('.minus-btn').click(function() {
+                var input = $(this).parent().next('input.qty-input');
+                var currentVal = parseInt(input.val());
+                if (!isNaN(currentVal) && currentVal > 1) {
+                    input.val(currentVal - 1).change();
+                    updateCartItem($(this).closest('tr'));
+                }
+            });
+        
+            // Quantity input change event
+            $('.qty-input').change(function() {
+                var input = $(this);
+                var newVal = parseInt(input.val());
+                var stockCount = parseInt(input.attr('max'));
+                if (!isNaN(newVal) && newVal > stockCount) {
+                    input.val(stockCount);
+                }
+                updateCartItem($(this).closest('tr'));
+            });
+        });
+        </script>
+        
+
+{% endblock content %}

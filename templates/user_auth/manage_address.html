@@ -1,0 +1,182 @@
+{% extends 'user_auth/base.html' %}
+
+{% block content %}
+{% load static %}
+
+<style>
+    .manage-address-body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+
+    .manage-address-heading {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .manage-address-form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .manage-address-label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .manage-address-input {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .manage-address-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .manage-address-button:hover {
+        background-color: #45a049;
+    }
+
+    .address-list {
+        list-style-type: none;
+        padding: 0;
+        margin-top: 20px;
+    }
+
+    .address-item {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .address-info {
+        flex: 1;
+    }
+
+    .address-text {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .action-buttons {
+        flex-shrink: 0;
+    }
+
+    .btn-sm {
+        padding: 5px 10px;
+    }
+
+    .btn-primary,
+    .btn-danger,
+    .btn-info {
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover,
+    .btn-danger:hover,
+    .btn-info:hover {
+        filter: brightness(90%);
+    }
+</style>
+
+<div class="container">
+    <h1 class="mt-4 mb-4">Manage Address</h1>
+
+    <form method="post" class="mb-4" onsubmit="return validateForm()">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <label for="house_name" class="col-sm-2 col-form-label">House Name:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="house_name" name="house_name" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="street" class="col-sm-2 col-form-label">Street:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="street" name="street" pattern="[^\s]+" title="No spaces allowed" required>
+            </div>
+        </div>
+    
+        <div class="row mb-3">
+            <label for="city" class="col-sm-2 col-form-label">City:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="city" name="city" pattern="[^\s]+" title="No spaces allowed" required>
+            </div>
+        </div>
+    
+        <div class="row mb-3">
+            <label for="state" class="col-sm-2 col-form-label">State:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="state" name="state" pattern="[^\s]+" title="No spaces allowed" required>
+            </div>
+        </div>
+    
+        <div class="row mb-3">
+            <label for="zip" class="col-sm-2 col-form-label">ZIP Code:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="zip" name="zip" pattern="\d{6}" title="Enter a 5-digit ZIP code" required>
+            </div>
+        </div>
+    
+        <button type="submit" class="btn btn-primary">Add Address</button>
+    </form>
+    
+
+
+    <h2>Existing Addresses:</h2>
+    <div class="address-list">
+        {% for add in Address %}
+        <div class="address-item">
+            <div class="address-info">
+                <span class="address-text">{{add.house_name}},{{ add.street }}, {{ add.city }}, {{ add.state }},{{ add.zip }}</span>
+            </div>
+            <div class="action-buttons">
+                <!-- Edit Button -->
+                <a href="{% url 'user_profile:edit_address' add.id %}" class="btn btn-primary btn-sm me-2">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <!-- View Button -->
+                <a href="{% url 'user_profile:view_address' add.id %}" class="btn btn-info btn-sm me-2">
+                    <i class="bi bi-eye"></i> View
+                </a>
+                <!-- Delete Button -->
+                <a href="{% url 'user_profile:delete_address' add.id %}" class="btn btn-danger btn-sm">
+                    <i class="bi bi-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<script>
+    function validateForm() {
+        var zipCode = document.getElementById('zip').value.trim();
+        if (!/^\d+$/.test(zipCode)) {
+            alert("ZIP Code should contain only numbers.");
+            return false;
+        }
+        return true;
+    }
+</script>
+
+{% endblock %}
