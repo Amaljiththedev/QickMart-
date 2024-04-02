@@ -49,6 +49,11 @@
         <script src="{% static 'assets/user_auth/js/vendor/modernizr-2.8.3.min.js' %}"></script> 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Include SweetAlert library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 
     </head>
 
@@ -119,7 +124,7 @@
                                     <ul class="hm-menu">
                                         <!-- Begin Header Middle Wishlist Area -->
                                         <li class="hm-wishlist">
-                                            <a href="wishlist.html">
+                                            <a href="{% url 'user_profile:wishlist' %}">
                                                 <span class="wishlist-count wishlist-item-count"></span>
                                                 <i class="fa fa-heart-o"></i>
                                             </a>

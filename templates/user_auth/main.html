@@ -169,7 +169,9 @@
                                             {% else %}
                                                 <li class="add-cart disabled">Out of Stock</li>
                                             {% endif %}
-                                            <button class="addToWishlistBtn" data-product-id="{{ product.id }}">Add to Wishlist</button>
+                                            <li class="links-details addToWishlistBtn" href="wishlist.html" data-product-id="{{ product.id }}">
+                                                <a href="#"><i class="fa fa-heart-o"></i></a>
+                                              </li>
                                             <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
                                         </ul>
                                     </div>
@@ -190,6 +192,8 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Include SweetAlert library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 
 <script>
     $(document).ready(function() {
@@ -242,23 +246,43 @@
     $(document).ready(function() {
         $('.addToWishlistBtn').click(function(e) {
             e.preventDefault();
-            var productId = $(this).data('product-id');
+            var productId = $(this).data('product-id'); // Retrieve the product ID from data attribute
             $.ajax({
                 type: 'POST',
-                url: '{% url "user_profile:add_to_wishlist" %}',
+                url: '{% url "user_profile:add_to_user_wishlist" %}',
                 data: {
                     'product_id': productId,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    'csrfmiddlewaretoken': '{{ csrf_token }}' // Ensure you have csrf_token available
                 },
                 success: function(response) {
                     if (response.success) {
-                        alert('Item added to wishlist successfully.');
+                        // Update the cart dynamically here
+                        console.log(response.success); // Log the success message
+                        // Display success message using SweetAlert
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.success,
+                        });
                     } else if (response.error) {
-                        alert(response.error);
+                        // Display error message using SweetAlert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.error,
+                        });
                     }
                 },
                 error: function(xhr, textStatus, error) {
-                    alert('Error adding item to wishlist. Please try again.');
+                    console.log(xhr.statusText);
+                    console.log(textStatus);
+                    console.log(error);
+                    // Handle the error here, such as showing an alert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Error adding item to wishlist. Please try again.',
+                    });
                 }
             });
         });

@@ -68,11 +68,14 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     
-class Wishlist(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='wishlist')
-    products = models.ForeignKey(Products, related_name='wishlist_items',on_delete=models.CASCADE, blank=True)
 
-    def __str__(self):
-        return f"Wishlist of {self.user.username}"
-    
-    
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(CustomUser, related_name='customers_wishlist', on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, related_name='wishlist_products', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class UserWishlist(models.Model):
+    user = models.ForeignKey(CustomUser, related_name='customerswishlist', on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, related_name='wishlistproducts', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)

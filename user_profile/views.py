@@ -1,6 +1,6 @@
 import secrets
 import smtplib
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse
 from Qickmart import settings
@@ -10,7 +10,7 @@ from registration.views import generate_otp
 from user_auth.models import CustomUser 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Address, Cart, Order, OrderItem, payment,Wishlist
+from .models import Address, Cart, Order, OrderItem, UserWishlist, payment,Wishlist
 from django.db.models import Q
 from category.models import category as Category
 from django.shortcuts import redirect, get_object_or_404
@@ -462,16 +462,38 @@ def wallet_payment(request, order_id):
     }
     return render(request, 'user_auth/wallet_payment.html', context)
 
-def add_to_wishlist(request):
-    print('add_to_wishlist')
-    product_id = request.POST.get('product_id')
 
+
+def wishlist(request):
+    wishlist_items = UserWishlist.objects.filter(user=request.user)
     
-    product = get_object_or_404(Products, id=product_id)
-            
-    wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
-            
-    if product in wishlist.products.all():
-            return JsonResponse({'error': 'Item already exists in the wishlist.'}, status=400)
-            
-    wishlist.products.add(product)
+    context={
+        'wishlist_items':wishlist_items
+    }
+    return render(request, 'user_auth/wishlist.html',context)
+
+
+def user_add_to_wishlist(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        product_id = request.POST.get('product_id')
+        
+        product = get_object_or_404(Products, id=product_id)
+        
+        # Check if the product is already in the user's wishlist
+        if UserWishlist.objects.filter(user=request.user, product=product).exists():
+            return JsonResponse({'error': 'Product is already in the wishlist.'}, status=400)
+
+        # Create a new UserWishlist object for the user and product
+        UserWishlist.objects.create(user=request.user, product=product)
+
+        return JsonResponse({'success': 'Product added to wishlist successfully.'})
+    
+    return JsonResponse({'error': 'User is not authenticated or request method is not POST.'}, status=403)
+
+
+def remove_from_wishlist(request,id):
+    item=get_object_or_404(UserWishlist,id=id)
+    
+    item.delete()
+    return redirect('user_profile:wishlist')
+
