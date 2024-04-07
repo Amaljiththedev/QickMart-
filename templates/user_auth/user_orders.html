@@ -64,7 +64,7 @@
                                     </td>
                                     <td class="text-center">₹{{ order.total_price }}</td>
                                     <td class="text-center">{{ order.payment_method }}</td>
-                                    <td class="text-center">{{ order.status }}</td>
+                                    <td class="text-center"><a href="{% url 'user_profile:order_details' order.id %}" id="track_order_button_{{ order.id }}" class="btn btn-info track_order-btn">Track Order</a></td>
                                     <td class="text-center">
                                     {% if order.status == 'Pending' or order.status == 'Processing' %}
                                         <button type="button" class="btn btn-danger cancel-btn" data-order-id="{{ order.id }}">Cancel</button>

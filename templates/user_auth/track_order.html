@@ -2,22 +2,15 @@
 {% extends 'user_auth/base.html' %}
 {% load static %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Order</title>
-    <!-- Include Stroke 7 Icon font stylesheet -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pixeden-stroke-7-icon@1.2.3/pe-icon-7-stroke/dist/pe-icon-7-stroke.min.css">
-    <!-- Include Bootstrap CSS for styling (optional) -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Custom CSS styles -->
-    <style>
-    
-        @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
-.container4 {
+<style>
+
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+body {
+    background-color: #eeeeee;
+    font-family: 'Open Sans', serif;
+}
+.container {
     margin-top: 50px;
     margin-bottom: 50px;
 }
@@ -144,34 +137,48 @@ p {
     border-color: #ff2b00;
     border-radius: 1px;
 }
+</style>
 
-    
-    </style>
-</head>
-<body>
-    <div class="container4">
-        <article class="card">
-            <header class="card-header"> My Orders / Tracking </header>
-            <div class="card-body">
-                <h6>Order ID: {{ order.order_id }}</h6>
-                <article class="card">
-                    <div class="card-body row">
-                        <div class="col"> <strong>Estimated Delivery time:</strong> <br>{{ order.estimated_delivery_time }}</div>
-                        <div class="col"> <strong>Shipping BY:</strong> <br>Blue Dart</div>
-                        <div class="col"> <strong>Status:</strong> <br>{{ order.status }}</div>
-                        <div class="col"> <strong>Tracking #:</strong> <br>{{ order.tracking_number }}</div>
-                    </div>
-                </article>
-                <div class="track">
-                    {% for step in order.steps %}
-                    <div class="step {% if step.active %}active{% endif %}"> <span class="icon"> <i class="fa {{ step.icon }}"></i> </span> <span class="text">{{ step.text }}</span> </div>
-                    {% endfor %}
+
+
+<div class="container">
+    <article class="card">
+        <header class="card-header"> My Orders / Tracking </header>
+        <div class="card-body">
+            <h6>Order ID: OD45345345435</h6>
+            <article class="card">
+                <div class="card-body row">
+                    <div class="col"> <strong>Estimated Delivery time:</strong> <br>{{ order.estimated_delivery_time }} </div>
+                    <div class="col"> <strong>Status:</strong> <br>{{ order.get_status_display }} </div>
+                    <div class="col"> <strong>Tracking #:</strong> <br>{{ order.tracking_number }} </div>
                 </div>
-                <hr>
-                <a href="#" class="btn btn-warning" data-abc="true"> <i class="fa fa-chevron-left"></i> Back to orders</a>
+            </article>
+            <div class="track">
+                {% for step in tracking_steps %}
+                    <div class="step {% if step.active %}active{% endif %}">
+                        <span class="icon"> <i class="{{ step.icon }}"></i> </span>
+                        <span class="text">{{ step.text }}</span>
+                    </div>
+                {% endfor %}
             </div>
-        </article>
-    </div>
-</body>
+            <hr>
+            <ul class="row">
+                {% for item in order.orderitem_set.all %}
+                    <li class="col-md-4">
+                        <figure class="itemside mb-3">
+                            <div class="aside"><img src="{{ item.product.image.url }}" class="img-sm border"></div>
+                            <figcaption class="info align-self-center">
+                                <p class="title">{{ item.product.title }}</p> 
+                                <span class="text-muted">₹{{ item.price }}</span>
+                            </figcaption>
+                        </figure>
+                    </li>
+                {% endfor %}
+            </ul>
+            <hr>
+            <a href="{% url 'user_profile:user_orders' %}" class="btn btn-warning" data-abc="true"> <i class="fa fa-chevron-left"></i> Back to orders</a>
+        </div>
+    </article>
+</div>
 
 {%endblock%}

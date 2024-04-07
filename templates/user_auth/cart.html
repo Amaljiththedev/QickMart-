@@ -168,7 +168,7 @@
                     }
                 });
             }
-        
+    
             // Function to update cart totals
             function updateCartTotals() {
                 var subtotal = 0;
@@ -179,7 +179,10 @@
                 var total = subtotal + 50; // Assuming delivery charge is ₹50
                 $('#total').text('₹' + total.toFixed(2));
             }
-        
+    
+            // Initial calculation of cart totals when the page loads
+            updateCartTotals();
+    
             // Plus button click event
             $('.plus-btn').click(function() {
                 var input = $(this).parent().prev('input.qty-input');
@@ -190,7 +193,7 @@
                     updateCartItem($(this).closest('tr'));
                 }
             });
-        
+    
             // Minus button click event
             $('.minus-btn').click(function() {
                 var input = $(this).parent().next('input.qty-input');
@@ -200,7 +203,7 @@
                     updateCartItem($(this).closest('tr'));
                 }
             });
-        
+    
             // Quantity input change event
             $('.qty-input').change(function() {
                 var input = $(this);
@@ -212,7 +215,6 @@
                 updateCartItem($(this).closest('tr'));
             });
         });
-        </script>
-        
+    </script>
 
 {% endblock content %}

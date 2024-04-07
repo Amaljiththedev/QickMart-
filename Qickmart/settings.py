@@ -87,11 +87,11 @@ WSGI_APPLICATION = 'Qickmart.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'Ecommerce', 
+        'NAME': 'postgres', 
         'USER': 'postgres',
         'PASSWORD': '7025',
         'HOST': '127.0.0.1', 
-        'PORT': '5432',
+        'PORT': '5678',
     }
 }
 
@@ -166,6 +166,6 @@ CKEDITOR_CONFIGS = {
     },
 }
 
-RAZORPAY_KEY_ID='rzp_test_O8M2AeQbEM5Mcp'
-RAZORPAY_SECRET_KEY='Nxelb4U3Kinhwoivpb8TawsC'
+RAZORPAY_KEY_ID='rzp_test_mIfQHGI8YglKj3'
+RAZORPAY_SECRET_KEY='qp1DPcg2z5M1IBL0T7AwXGVt'
 

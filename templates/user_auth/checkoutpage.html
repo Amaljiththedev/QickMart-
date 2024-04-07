@@ -3,20 +3,66 @@
 
 {% block content %}
 <style>
-    .grand-total-label {
-        text-align: right;
-        margin-right:100px;
+    .container {
+        margin-top: 20px;
     }
-    
-    .grand-total-amount {
-        text-align: center;
+
+    .checkout-area {
+        background-color: #f9f9f9;
+        padding: 30px;
+        border-radius: 10px;
+    }
+
+    .coupon-accordion {
+        margin-bottom: 20px;
+    }
+
+    .coupon-accordion h3 {
+        margin-top: 0;
+    }
+
+    .your-order {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .payment {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-pay-razorpay {
+        background-color: #f76900;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-pay-razorpay:hover {
+        background-color: #f55500;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #5a6268;
     }
 </style>
 
-<!-- Check if cart is not empty before displaying checkout area -->
 {% if cart %}
-<div class="checkout-area pt-60 pb-30">
-    <div class="container">
+<div class="container">
+    <div class="checkout-area">
         <div class="row">
             <div class="col-12">
                 <div class="coupon-accordion">
@@ -27,6 +73,7 @@
         <form action="{% url 'user_profile:confirm_orders' %}" method="post">
             {% csrf_token %}
             <div class="row">
+                <!-- Billing Details Column -->
                 <div class="col-lg-6 col-12">
                     <div class="checkbox-form">
                         <input type='text' value="{{order_id}}" name="order_id" hidden/>
@@ -46,6 +93,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- Your Order Column -->
                 <div class="col-lg-6 col-12">
                     <div class="your-order">
                         <h3>Your order</h3>
@@ -76,13 +124,13 @@
                         <h3>Payment</h3>
                         <div class="form-group">
                             <label for="payment-method">Select Payment Method:</label>
-                            <select id="payment-method" class="form-control" name="payment_method">
+                            <select id="payment-method" class="form-control" name="payment_method" onchange="togglePaymentButtons(this.value)">
                                 {% for key, value in payment_modes.items %}
-                                <option value="{{ key }}">{{ value }}</option>
+                                    <option value="{{ key }}">{{ value }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block mt-3">Confirm Orders</button>
+                        <button id="confirm-orders-button" type="submit" class="btn btn-primary btn-block mt-3">Confirm Orders</button>
                     </div>
                     <div class="row">
                         <div class="col-12">
@@ -105,4 +153,7 @@
     </div>
 </div>
 {% endif %}
+
+
+
 {% endblock %}

@@ -28,9 +28,12 @@ urlpatterns = [
     path('cancel-order/<int:order_id>/', views.cancel_order, name='cancel_order'),
     path('cart-items-count/', views.cart_items_count, name='cart_items_count'),
     path('track-order/', views.track_order, name='track_order'),
+    path('order/<int:order_id>/', views.order_details, name='order_details'),
     path('wishlist_view/', views.wishlist, name='wishlist'),
     path('user_wishlist/', views.user_add_to_wishlist, name='add_to_user_wishlist'),
     path('remove_from_wishlist/<int:id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+    path('success/',views.success,name="success"),
+    path('razor_pay/',views.razor_payment,name="razor_payment")
     
 
 ]
