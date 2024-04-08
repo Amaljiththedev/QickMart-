@@ -33,7 +33,8 @@ urlpatterns = [
     path('user_wishlist/', views.user_add_to_wishlist, name='add_to_user_wishlist'),
     path('remove_from_wishlist/<int:id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('success/',views.success,name="success"),
-    path('razor_pay/',views.razor_payment,name="razor_payment")
+    path('razor_pay/',views.razor_payment,name="razor_payment"),
+    path('change_password/',views.reset_password,name="reset_passwords"),
     
 
 ]

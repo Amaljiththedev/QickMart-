@@ -71,11 +71,11 @@
                                     {% elif order.status == 'Delivered' %}
                                         <button type="button" class="btn btn-info cancel-btn" data-order-id="{{ order.id }}">Return Order</button>
                                     {% elif order.status == 'Out of delivery' %}
-                                        <a href="{% url 'user_profile:track_order' %}" class="btn btn-info track_order-btn">Track Order</a>
-                                    {% elif order.status == 'Cancelled' %}
+                                        <a href="{% url 'user_profile:track_order' %}" class="btn btn-info track_order-btn" hidden>Track Order</a>
+                                    {% elif order.status == 'Cancelled' and order.paid %}
                                         <button type="button" class="btn btn-info cancel-btn" data-order-id="{{ order.id }}">Refund Status</button>
                                     {% elif order.status == 'Shipped' %}
-                                        <a href="{% url 'user_profile:track_order'  %}" class="btn btn-info track_order-btn">Track Order</a>
+                                        <a href="{% url 'user_profile:track_order'  %}" class="btn btn-info track_order-btn" hidden>Track Order</a>
                                     {% endif %}
                                     
                                     

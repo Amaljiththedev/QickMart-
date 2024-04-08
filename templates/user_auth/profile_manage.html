@@ -54,6 +54,11 @@
                 <input type="text" id="phone" name="phone" value="{{ custom_user.phone }}">
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{% url 'user_profile:reset_passwords' %}" class="btn btn-primary">Change Password</a>
+            </div>
+        </div>
         <!-- Add more fields as needed -->
         <button type="button" class="btn btn-primary" onclick="validateForm()">Save Changes</button>
     </form>

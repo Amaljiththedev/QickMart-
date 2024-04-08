@@ -19,6 +19,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import logout
+
 
 
 import razorpay
@@ -454,7 +456,7 @@ def wallet_payment(request, order_id):
         if wallet_balance >= total_price and wallet_balance > 0:
             user_profile.wallet_balance -= total_price
             user_profile.save()
-            order.payment_status = 'PAID'
+            order.paid = True
             order.save()
             messages.success(request, 'Payment successful. Order placed.')
             return redirect('user_profile:order_confirmation', order_id=order.id)
@@ -568,3 +570,9 @@ def order_details(request, order_id):
         'tracking_steps':tracking_steps
     }
     return render(request, 'user_auth/track_order.html', context)
+
+
+def reset_password(request):
+    if request.user.is_authenticated:
+        logout(request)
+        return redirect('forget_password')

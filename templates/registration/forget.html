@@ -23,7 +23,7 @@
                         <img src="{% static 'assets/register/image/logo.png' %}" width="150px">
                     </div>
                     <div class="reset-form d-block">
-                        <form class="reset-password-form" method="post" action="{% url 'forget_password' %}">
+                        <form class="reset-password-form" method="post">
                             {% csrf_token %}
                             <h4 class="mb-3">Reset your password</h4>
                             <p class="mb-3 text-white">Please enter your email</p>

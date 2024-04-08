@@ -10,28 +10,45 @@
   <link rel="shortcut icon" type="image/png" href="{% static 'assets/admin_auth/images/logos/favicon.png' %}" />
   <link rel="stylesheet" href="{% static 'assets/admin_auth/css/styles.min.css' %}" />
 
-<style>
-  /* Custom CSS for stock management */
-  .table th,
-  .table td {
-    vertical-align: middle;
-  }
-
-  .table th {
-    font-weight: bold;
-  }
-
-  .table img {
-    max-width: 50px;
-    max-height: 50px;
-    border-radius: 5px;
-  }
-
-  .btn a {
-    color: white;
-    text-decoration: none;
-  }
-</style>
+  <style>
+    /* Custom CSS for stock management */
+    .table th,
+    .table td {
+      vertical-align: middle;
+    }
+  
+    .table th {
+      font-weight: bold;
+    }
+  
+    .table img {
+      max-width: 50px;
+      max-height: 50px;
+      border-radius: 5px;
+    }
+  
+    .btn a {
+      color: white;
+      text-decoration: none;
+    }
+  
+    /* Additional custom styles for spacing */
+    .page-wrapper {
+      padding: 20px;
+    }
+  
+    .card-title {
+      margin-bottom: 20px;
+    }
+  
+    .card-body {
+      padding: 20px;
+    }
+  
+    .table-responsive {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
   <!--  Body Wrapper -->
@@ -216,10 +233,12 @@
                                   </td>
                                   
                                   <td>
-                                    {% if order.status == "Return" or order.status == "Cancelled" %}
+                                    {% if order.status == "Return" or order.status == "Cancelled" and order.paid == True %}
                                         <a href="{% url 'refund_order' order.id %}" class="btn btn-primary">Refund</a>
-                                    {% else %}
-                                        <a href="{% url 'update_order_details' order.id %}" class="btn btn-primary">Update Details</a>
+                                    {% elif order.status == "Return" or order.status == "Cancelled" %}
+                                        <a href="{% url 'update_order_details' order.id %}" class="btn btn-primary" hidden>Update Details</a>
+                                    {%else%}
+                                    <a href="{% url 'update_order_details' order.id %}" class="btn btn-primary" >Update Details</a>
                                     {% endif %}
                                 </td>
                               </tr>
