@@ -40,8 +40,9 @@ urlpatterns = [
     path('ordermanagement/', stock_management.order_management, name='order_management'),
      path('update_status/<int:order_id>/', stock_management.update_status, name='update_status'),
     path('variant_management/', products_views.variant_management, name='variant'),
-    path('edit-variant/<int:variant_id>/', products_views.edit_variant, name='edit_variant'),
-    path('delete-variant/<int:variant_id>/', products_views.delete_variant, name='delete_variant'),
+    path('show_variants/<int:product_id>', products_views.show_variants, name='show_variants'),
+    path('variant/<int:variant_id>/block/', products_views.block_variant, name='block_variant'),
+    path('variant/<int:variant_id>/delete/', products_views.delete_variant, name='delete_variant'),
     path('block-variant/<int:variant_id>/', products_views.block_variant, name='block_variant'),
     path('unblock-variant/<int:variant_id>/', products_views.unblock_variant, name='unblock_variant'),
     path('update-order/<int:order_id>/', stock_management.update_order_details, name='update_order_details'),
@@ -50,6 +51,7 @@ urlpatterns = [
     path('add-coupon', stock_management.add_coupon, name='add_coupon'),
     path('edit-coupon/<int:coupon_id>/', stock_management.edit_coupon, name='edit_coupon'),
     path('delete-coupon/<int:coupon_id>/', stock_management.delete_coupon, name='delete_coupon'),
+
     
     
 ]

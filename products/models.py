@@ -33,9 +33,11 @@ class ProductVariant(models.Model):
     product = models.ForeignKey(Products, on_delete=models.CASCADE, related_name='product_variants')
     price = models.PositiveIntegerField(null=True)
     stock_count = models.IntegerField(default=0)
-    size = models.CharField(max_length=50, null=True, blank=True)
+    ram = models.CharField(max_length=50, null=True, blank=True)
+    internal_storage = models.CharField(max_length=50, null=True, blank=True)
+    inch = models.CharField(max_length=50, null=True, blank=True)
     color = models.CharField(max_length=50, null=True, blank=True)
-    is_active=models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.product.title} - {self.size} - {self.color}"

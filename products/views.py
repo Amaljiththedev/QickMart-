@@ -157,22 +157,6 @@ def delete_product(request,id):
     return render(request,'admin_auth/authentication-login.html')
 
 
-def add_variant(request, product_id):
-    product = Products.objects.get(pk=product_id)
-    if request.method == 'POST':
-        size = request.POST.get('size')
-        color = request.POST.get('color')
-        price = request.POST.get('price')
-        stock_count = request.POST.get('stock_count')
-        variant = ProductVariant.objects.create(product=product, size=size, color=color, price=price, stock_count=stock_count)
-        
-        # Handling image uploads
-        for image in request.FILES.getlist('images'):
-            variant_image = VariantImage.objects.create(variant=variant, image=image)
-        
-        return redirect('product_management')  # Redirect to product detail page
-    return render(request, 'admin_auth/add_variant.html', {'product': product})
-
 def edit_variant(request, variant_id):
     variant_product = get_object_or_404(ProductVariant, id=variant_id)
     
@@ -211,12 +195,62 @@ def unblock_variant(request, variant_id):
     variant_product.save()
     return redirect('variant')
     
+
+
+
 def variant_management(request):
-    variant_products = ProductVariant.objects.all()
-    
-    # Pass the variant products to the template as context
+    # Fetch all products from the database
+    products = Products.objects.all()
     context = {
-        'variant_products': variant_products
+        'products': products
     }
-    
     return render(request, 'admin_auth/variant_management.html', context)
+
+def add_variant(request, product_id):
+    if request.method == 'POST':
+        price = request.POST.get('price')
+        stock_count = request.POST.get('stock_count')
+        ram = request.POST.get('Ram')
+        internal_storage = request.POST.get('internal')
+        inch = request.POST.get('inch')
+        color = request.POST.get('color')
+        images = request.FILES.getlist('images')  # Get list of uploaded images
+        
+        # Create a new ProductVariant instance
+        variant = ProductVariant(
+            product_id=product_id,
+            price=price,
+            stock_count=stock_count,
+            ram=ram,
+            internal_storage=internal_storage,
+            inch=inch,
+            color=color
+        )
+        variant.save()
+        
+        # Save the uploaded images
+        for image in images:
+            variant_image = VariantImage(variant=variant, image=image)
+            variant_image.save()
+        
+        return redirect('variant')  # Redirect to product detail page
+    
+    return render(request, 'admin_auth/add_variant.html', {'product_id': product_id})
+
+
+def show_variants(request, product_id):
+    product = Products.objects.get(pk=product_id)
+    variants = ProductVariant.objects.filter(product_id=product_id)
+    return render(request, 'admin_auth/show_variants.html', {'product': product, 'variants': variants})
+
+def block_variant(request, variant_id):
+    variant = ProductVariant.objects.get(pk=variant_id)
+    variant.is_active = False
+    variant.save()
+    return redirect('show_variants')
+
+def delete_variant(request, variant_id):
+    variant = get_object_or_404(ProductVariant, pk=variant_id)
+    product_id = variant.product_id
+    variant.delete()
+    return redirect('show_variants',product_id=product_id)

@@ -58,10 +58,14 @@
         <h1>Add Variant for {{ product.title }}</h1>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <label for="size">Size:</label>
-            <input type="text" id="size" name="size">
+            <label for="size">Ram:</label>
+            <input type="text" id="Ram" name="Ram">
+            <label for="color">Inch:</label>
+            <input type="text" id="color" name="inch">
             <label for="color">Color:</label>
             <input type="text" id="color" name="color">
+            <label for="internal">Internal Storage:</label>
+            <input type="text" id="color" name="internal">
             <label for="price">Price:</label>
             <input type="number" id="price" name="price">
             <label for="stock_count">Stock Count:</label>

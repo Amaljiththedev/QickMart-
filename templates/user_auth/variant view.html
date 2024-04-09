@@ -561,27 +561,6 @@
     });
 </script>
 
-<script>
 
-    function showVariantDetails(variantId) {
-        $.ajax({
-            type: 'GET',
-            url: '{% url 'user_auth:get_variant_details' %}',
-            data: {
-                'variant_id': variantId
-            },
-            success: function(response) {
-                // Handle successful response
-                console.log('Variant details:', response.variant_data);
-                // Update the UI with variant details
-            },
-            error: function(xhr, status, error) {
-                // Handle error response
-                console.error('Error:', error);
-            }
-        });
-    }
-    
-</script>
 
 {%endblock content%}

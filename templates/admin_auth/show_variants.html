@@ -1,0 +1,76 @@
+<!-- product_variants.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.title }} Variants</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        li:last-child {
+            margin-bottom: 0;
+        }
+        strong {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ product.title }} Variants</h1>
+        <ul>
+            {% for variant in variants %}
+                <li>
+                    <strong>Price:</strong> {{ variant.price }}<br>
+                    <strong>Stock Count:</strong> {{ variant.stock_count }}<br>
+                    <strong>RAM:</strong> {{ variant.ram }}<br>
+                    <strong>Internal Storage:</strong> {{ variant.internal_storage }}<br>
+                    <strong>Inch:</strong> {{ variant.inch }}<br>
+                    <strong>Color:</strong> {{ variant.color }}<br>
+                    <!-- Add any other fields you want to display -->
+                    
+                    <!-- Block button -->
+                    <form action="{% url 'block_variant' variant.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit">Block</button>
+                    </form>
+                    
+                    <!-- Delete button -->
+                    <form action="{% url 'delete_variant' variant.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
