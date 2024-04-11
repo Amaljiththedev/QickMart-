@@ -58,7 +58,7 @@
                                         <td class="li-product-remove"><a href="{% url 'user_profile:remove_from_wishlist' item.id %}"><i class="fa fa-times"></i></a></td>
                                         <td class="li-product-thumbnail"><a href="#"><img src="{{ item.product.image.url }}" alt=""></a></td>
                                         <td class="li-product-name"><a href="#">{{ item.product.title }}</a></td>
-                                        <td class="li-product-price"><span class="amount">${{ item.product.price }}</span></td>
+                                        <td class="li-product-price"><span class="amount">₹{{ item.product.price }}</span></td>
                                         <td class="li-product-stock-status">
                                             {% if item.product.stock_count == 0 %}
                                                 <span class="out-of-stock">Out of stock</span>

@@ -179,28 +179,23 @@
                                     <thead>
                                         <tr>
                                             <th>Image</th>
-                                            <th>Title</th>
-                                            <th>price</th>
-                                            <th>Description</th>
                                             <th>Update</th>
-                                            <th>Block</th>
                                             <th>Delete</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                     {% for x in banner %}
                                         <tr>
-                                            <td><img src="{{ x.image.url }}" alt="" class="product-image"></td>
-                                            <td></td>
-                                            <td>{{x.price}}</td>
-                                            <td>{{x.description}}</td>
+                                            <td><img src="{{ x.image.url }}" alt="" style="height:30px" class="product-image"></td>
+    
                                             <td>
-                                                <a href="{% url 'update_banner' x.id%}" class="btn btn-sm btn-info">update</a>
-                                                {% if x.is_active %}
-                                                <td><a href="{% url 'block_banner' x.id %}" class="btn btn-warning" role="button">Block</a></td>
+                                                <a href="{% url 'update_banner' x.id%}" class="btn btn-sm btn-info">update</a></td>
+                                                {% comment %} {% if x.is_active %} {% endcomment %}
+                                                {% comment %} <td><a href="{% url 'block_banner' x.id %}" class="btn btn-warning" role="button">Block</a></td>
                                                 {% else %}
                                                 <td><a href="{% url 'unblock_banner' x.id %}" class="btn btn-success" role="button">unblock</a></td>
-                                                {% endif %}
+                                                {% endif %} {% endcomment %}
+                                                <td>
                                                 <a href="{% url 'delete_banner' x.id}" class="btn btn-sm btn-danger">Delete</a>
                                             </td>
                                         </tr>

@@ -30,6 +30,7 @@ urlpatterns = [
     path('register/', include('registration.urls')),
     path('user_auth/', include(('user_auth.urls', 'user_auth'), namespace='user_auth')),
     path('user_profile/',include(('user_profile.urls', 'user_profile'),namespace='user_profile')),
+    path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:

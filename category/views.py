@@ -128,13 +128,13 @@ def add_banner(request):
             title = request.POST.get('title')
             cat_id = request.POST.get('category')
             image = request.FILES.get('image')
-            price=request.POST.get('price')
-            offer_details=request.POST('offer_details')
+            price = request.POST.get('price')
+            offer_details = request.POST.get('offer_details')
             
             # Check if all required data is provided
-            if title and category and image:
-                cat=Category.objects.get(id=cat_id)
-                banner = Banner.objects.create(title=title, category=cat, image=image,price=price,offer_details=offer_details)
+            if title and cat_id and image:
+                cat = Category.objects.get(id=cat_id)
+                banner = Banner.objects.create(title=title, category=cat, image=image, price=price, offer_details=offer_details)
                 return redirect('banner_management')
             else:
                 # Handle invalid or incomplete form submission
@@ -162,7 +162,7 @@ def update_banner(request,id):
             cat_id=request.POST.get('cat_id')
             image=request.POST.get('image')
             price=request.POST.get('price')
-            offer_details=request.POST('offer_details')
+            offer_details=request.POST['offer_details']
         
         
             banner.title=title

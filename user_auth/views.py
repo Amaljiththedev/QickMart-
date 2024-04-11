@@ -1,10 +1,11 @@
+from decimal import Decimal
 from django.shortcuts import render
 from category.models import category,Brand
 from banner.models import Banner
 from category.views import views
 from products.models import ProductVariant, Products, ProductImage
 import os
-from django.db.models import Q
+from django.db.models import Q,Count
 from django.http import JsonResponse
 
 from django.shortcuts import render, get_object_or_404
@@ -19,8 +20,7 @@ def home(request):
     Category=category.objects.filter(is_active=True)[:5]
     products=Products.objects.filter(is_active=True,status='In Stock')
     brand=Brand.objects.all()
-
-
+    allban=Banner.objects.all()
     
     
     
@@ -28,6 +28,7 @@ def home(request):
         'Category': Category,
         'products': products,
         'brand': brand,
+        'allban':allban,
     }
     
     
@@ -67,7 +68,7 @@ def banner_view(request):
         
     }
     
-    return render(request, 'user_auth/product-view.html', context)        
+    return render(request, 'user_auth/main.html', context)        
 
 
 
@@ -103,7 +104,10 @@ def list_of_products(request):
             products = products.order_by('-created_date')  # Sort by creation date descending
             
         elif sort_by =='trending':
-            products = products.filter(trending=True)
+             products = products.annotate(num_orders=Count('order')).order_by('-num_orders')
+
+        elif sort_by=='featured':
+            products=products.filter(trending=True)
     context = {
         'products': products,
         'categories': categories,
@@ -117,31 +121,35 @@ def list_of_products(request):
     return render(request, 'user_auth/product_list.html', context)
 
 
-
 def search(request):
     query = request.POST.get('searched') or request.GET.get('searched') or request.session.get('searched_query', '')
     request.session['searched_query'] = query
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     category_id = request.GET.get('category_id')
-    brand_id=request.GET.get('brand_id')
+    brand_id = request.GET.get('brand_id')
 
     products = Products.objects.all()
 
-    # Filter products based on the search query and price range
+    # Filter products based on the search query
     if query:
         products = products.filter(
-            Q(title__icontains=query) | 
-            Q(category__name__icontains=query) | 
+            Q(title__icontains=query) |
+            Q(category__name__icontains=query) |
             Q(brand__brand_name__icontains=query)
         )
 
+    # Filter products based on the price range
     if min_price is not None and max_price is not None:
+        min_price = Decimal(min_price)
+        max_price = Decimal(max_price)
         products = products.filter(price__range=(min_price, max_price))
-    
+
+    # Filter products based on the category
     if category_id:
         products = products.filter(category_id=category_id)
-        
+
+    # Filter products based on the brand
     if brand_id:
         products = products.filter(brand_id=brand_id)
 
@@ -154,7 +162,7 @@ def search(request):
         'brands': brands,
         'searched_query': query,
         'selected_category': int(category_id) if category_id else None,
-        'selected_brand':int(brand_id) if brand_id else None,
+        'selected_brand': int(brand_id) if brand_id else None,
     }
 
     return render(request, 'user_auth/search.html', context)
@@ -183,3 +191,4 @@ def get_variant_details(request):
             return JsonResponse({'error': 'Variant not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+    

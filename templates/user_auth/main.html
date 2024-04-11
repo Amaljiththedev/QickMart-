@@ -18,45 +18,6 @@
                             {% for cat in Category %}
                             <li class="right-menu">
                                 <a href="shop-left-sidebar.html">{{ cat.name }}</a>
-                                <ul class="cat-mega-menu">
-                                    <li class="right-menu cat-mega-title">
-                                        <a href="shop-left-sidebar.html">Prime Video</a>
-                                        <ul>
-                                            <li><a href="#">All Videos</a></li>
-                                            <li><a href="#">Blouses</a></li>
-                                            <li><a href="#">Evening Dresses</a></li>
-                                            <li><a href="#">Summer Dresses</a></li>
-                                            <li><a href="#">T-shirts</a></li>
-                                            <li><a href="#">Rent or Buy</a></li>
-                                            <li><a href="#">Your Watchlist</a></li>
-                                            <li><a href="#">Watch Anywhere</a></li>
-                                            <li><a href="#">Getting Started</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="right-menu cat-mega-title">
-                                        <a href="shop-left-sidebar.html">{{ cat.name }}</a>
-                                        <ul>
-                                            <li><a href="#">More to Explore</a></li>
-                                            <li><a href="#">TV & Video</a></li>
-                                            <li><a href="#">Audio & Theater</a></li>
-                                            <li><a href="#">Camera, Photo</a></li>
-                                            <li><a href="#">Cell Phones</a></li>
-                                            <li><a href="#">Headphones</a></li>
-                                            <li><a href="#">Video Games</a></li>
-                                            <li><a href="#">Wireless Speakers</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="right-menu cat-mega-title">
-                                        <a href="shop-left-sidebar.html">{{ cat.name }}</a>
-                                        <ul>
-                                            <li><a href="#">Amazon Home</a></li>
-                                            <li><a href="#">Kitchen & Dining</a></li>
-                                            <li><a href="#">Furniture</a></li>
-                                            <li><a href="#">Bed & Bath</a></li>
-                                            <li><a href="#">Appliances</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
                             </li>
                             {% endfor %}
                         </ul>
@@ -69,24 +30,30 @@
             <div class="col-lg-9">
                 <div class="slider-area pt-sm-30 pt-xs-30">
                     <div class="slider-active owl-carousel">
-                        <!-- Begin Single Slide Area -->
+                        <!-- Loop through each banner object -->
+                        {% for banner in allban %}
                         <div class="single-slide align-center-left animation-style-02 bg-4">
                             <div class="slider-progress"></div>
-                            <div class="slider-content">
-                                <h5>Sale Offer <span>-20% Off</span> This Week</h5>
-                                <h2>Chamcham Galaxy S9 | S9+</h2>
-                                <h3>Starting at <span>$589.00</span></h3>
-                                <div class="default-btn slide-btn">
-                                    <a class="links" href="shop-left-sidebar.html">Shopping Now</a>
+                            <div class="slider-content"> 
+                                <!-- Display the banner image -->
+                                <div class="banner-image-container">
+                                    <img src="{{ banner.image.url }}" alt="{{ banner.title }}">
+                                </div>
+                                <!-- Text content -->
+                                <div class="text-content">
+                                    <h5>{{ banner.title }}</h5>
+                                    <h2>{{ banner.category }}</h2>
+                                    <h3>{{ banner.offer_details }}</h3>
+                                    
+                                    <!-- Other content goes here -->
                                 </div>
                             </div>
                         </div>
-                        <!-- Single Slide Area End Here -->
-                        <!-- Begin Single Slide Area -->
-                        <!-- Single Slide Area End Here -->
+                        {% endfor %}
                     </div>
                 </div>
             </div>
+            
             <!-- Slider Area End Here -->
         </div>
     </div>
@@ -126,7 +93,7 @@
                     <h2><span>{{x.name}}</span></h2>
                 </div>
                 <div class="row">
-                    <div class="special-product-active owl-carousel">
+                    <div class="product-active owl-carousel">
                         {% for product in products %}
                         {% if product.category.name == x.name %}
                         <div class="col-lg-12">
@@ -158,9 +125,6 @@
                                         <div class="price-box">
                                             <span class="new-price">₹{{ product.price }}</span>
                                         </div>
-                                        <div class="countersection">
-                                            <div class="li-countdown"></div>
-                                        </div>
                                     </div>
                                     <div class="add-actions">
                                         <ul class="add-actions-link">
@@ -173,22 +137,23 @@
                                                 <a href="#"><i class="fa fa-heart-o"></i></a>
                                               </li>
                                             <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                        </ul>
-                                    </div>
+                                            </ul>
+                                        
+                                        </div>
                                     
+                                    </div>
                                 </div>
                             </div>
+                            {% endif %}
+                            {% endfor %}
                         </div>
-                        {% endif %}
-                        {% endfor %}
                     </div>
                 </div>
+                <!-- Li's Section Area End Here -->
             </div>
-            <!-- Li's Section Area End Here -->
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-</section>
+    </section>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Include SweetAlert library -->

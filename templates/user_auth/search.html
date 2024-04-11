@@ -163,7 +163,9 @@
                                                         <li class="add-cart disabled">Out of Stock</li>
                                                         {% endif %}
                                                         <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li>
-                                                        <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li>
+                                                        <li class="links-details addToWishlistBtn" href="wishlist.html" data-product-id="{{ prod.id }}">
+                                                            <a href="#"><i class="fa fa-heart-o"></i></a>
+                                                          </li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -219,7 +221,9 @@
                                                     {% else %}
                                                     <li class="add-cart disabled">Out of Stock</li>
                                                     {% endif %}
-                                                    <li class="wishlist"><a href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a></li>
+                                                    <li class="wishlist addToWishlistBtn" href="wishlist.html" data-product-id="{{ prod.id }}">
+                                                        <a href="#"><i class="fa fa-heart-o">Add to Wishlist</i></a>
+                                                      </li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -270,12 +274,12 @@
                         <div class="categori-checkbox">
                             <form action="#">
                                 <ul>
-                                    {%for brand in brands %}
+                                    {% for brand in brands %}
                                     <li>
                                         <input type="checkbox" name="brand_id" value="{{ brand.id }}" {% if brand.id == selected_brand %}checked{% endif %}>
-                                        <a href="{% url 'user_auth:user_product_list' %}?brand_id={{ brand.id }}"{% if brand.id == selected_category %}class="active"{% endif %}>{{ brand.brand_name }}</a>
-                                    </li> 
-                                    {%endfor%}
+                                        <a href="?searched={{ searched_query }}&brand_id={{ brand.id }}" {% if brand.id == selected_brand %}class="active"{% endif %}>{{ brand.brand_name }}</a>
+                                    </li>
+                                    {% endfor %}
                                 </ul>
                             </form>
                         </div>
@@ -287,12 +291,15 @@
                         <div class="categori-checkbox">
                             <form action="#">
                                 <ul>
-                                    {% for category in categories %}
-                                    <li>
-                                        <input type="checkbox" name="category_id" value="{{ category.id }}" {% if category.id == selected_category %}checked{% endif %}>
-                                        <a href="{% url 'user_auth:search' %}?category_id={{ category.id }}" {% if category.id == selected_category %}class="active"{% endif %}>{{ category.name }}</a>
-                                    </li>
-                                    {% endfor %}
+                                    <ul>
+                                        {% for category in categories %}
+                                        <li>
+                                            <input type="checkbox" name="category_id" value="{{ category.id }}" {% if category.id == selected_category %}checked{% endif %}>
+                                            <a href="?searched={{ searched_query }}&category_id={{ category.id }}" {% if category.id == selected_category %}class="active"{% endif %}>{{ category.name }}</a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    
                                 </ul>
                             </form>
                         </div>
@@ -302,21 +309,21 @@
                     <div class="filter-sub-area pt-sm-10 pt-xs-10">
                         <h5 class="filter-sub-titel">Price Range</h5>
                         <div class="price-range">
-                            <form action="{% url 'user_auth:search' %}" method="get">
+                            <form action="{% url 'user_auth:search' %}?searched={{ searched_query }}" method="get">
                                 <div class="form-group">
                                     <label for="min_price">Min Price:</label>
-                                    <input id="min_price" type="range" min="100" max="25000" value="" class="form-control slider" name="min_price">
-                                    <span id="minPriceValue">₹100</span>
+                                    <input id="min_price" type="range" min="100" max="25000" value="{{ min_price }}" class="form-control slider" name="min_price">
+                                    <span id="minPriceValue">₹{{ min_price }}</span>
                                 </div>
                                 <div class="form-group">
                                     <label for="max_price">Max Price:</label>
-                                    <input id="max_price" type="range" min="25000" max="900000" value="" class="form-control slider" name="max_price">
-                                    <span id="maxPriceValue">₹500000</span>
+                                    <input id="max_price" type="range" min="25000" max="900000" value="{{ max_price }}" class="form-control slider" name="max_price">
+                                    <span id="maxPriceValue">₹{{ max_price }}</span>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Apply</button>
+                                <button type="submit" class="btn btn-primary">Apply Filters</button>
                             </form>
                         </div>
-                    </div>
+                        
   
                 </div>
                 <!--sidebar-categores-box end  -->
@@ -327,7 +334,7 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Include SweetAlert library -->
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
         $('.addToCartBtn').click(function(e) {
@@ -396,6 +403,51 @@
     });
 </script>
 
-
+<script>
+    $(document).ready(function() {
+        $('.addToWishlistBtn').click(function(e) {
+            e.preventDefault();
+            var productId = $(this).data('product-id'); // Retrieve the product ID from data attribute
+            $.ajax({
+                type: 'POST',
+                url: '{% url "user_profile:add_to_user_wishlist" %}',
+                data: {
+                    'product_id': productId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}' // Ensure you have csrf_token available
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Update the cart dynamically here
+                        console.log(response.success); // Log the success message
+                        // Display success message using SweetAlert
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.success,
+                        });
+                    } else if (response.error) {
+                        // Display error message using SweetAlert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.error,
+                        });
+                    }
+                },
+                error: function(xhr, textStatus, error) {
+                    console.log(xhr.statusText);
+                    console.log(textStatus);
+                    console.log(error);
+                    // Handle the error here, such as showing an alert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Error adding item to wishlist. Please try again.',
+                    });
+                }
+            });
+        });
+    });
+    </script>
 
 {%endblock%}
