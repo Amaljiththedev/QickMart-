@@ -1,11 +1,47 @@
+import datetime
+from http.client import HTTPResponse
+from itertools import count
+import json
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
+from category.models import Brand, category
+from products.models import Products,ProductVariant
 from user_auth.models import CustomUserManager, CustomUser
 from django.contrib.auth import authenticate,login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.views.decorators.cache import never_cache
+from user_profile.models import Order,OrderItem
+from django.db.models import Count
+from django.db.models.functions import TruncMonth, TruncYear
+from django.db.models import Sum
+from django.utils import timezone
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.db.models import Count, Sum,F
+from django.utils import timezone
+from django.db.models.functions import TruncYear, TruncMonth
+from django.http import FileResponse
+import json
+from django.http import HttpHeaders
+from django.db.models import DateField
+import io
+from reportlab.platypus import SimpleDocTemplate
+from reportlab.lib.pagesizes import A4, inch
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from django.views.decorators.http import require_http_methods
+from datetime import date, datetime
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from django.http import HttpResponse
+from io import BytesIO
+from datetime import datetime, date
+from django.http import FileResponse
 # Create your views here.
 
 # Admin login login working pending session management
@@ -36,7 +72,175 @@ def admin_login(request):
 @login_required
 def dashboard(request):
     if 'email' in request.session:
-        return render(request,'admin_auth/index.html')
+        top_products = Products.objects.annotate(total_orders=Count('orderitem__order')).order_by('-total_orders')[:5]
+        monthly_revenue = Order.objects.filter().annotate(
+            month=TruncMonth('created_at')
+
+        ).values('month').annotate(total_revenue=Sum('total_price'))
+        filtered_orders = None
+        # Yearly Revenue
+        yearly_revenue = Order.objects.filter().annotate(
+            year=TruncYear('created_at')
+        ).values('year').annotate(total_revenue=Sum('total_price'))
+
+        orders= Order.objects.order_by('-id')
+        labels =[]
+        data=[]
+
+        for order in orders:
+            labels.append(str(order.id))
+            data.append(float(order.total_price))
+
+        total_customers = CustomUser.objects.count()
+
+        one_week_ago= timezone.now() - timezone.timedelta(weeks=1)
+
+        new_users_last_week = CustomUser.objects.filter(date_joined__gte=one_week_ago).count()
+
+        total_orders =OrderItem.objects.count()
+
+        
+        total_offer_price_amount = Order.objects.aggregate(total_offer_price_amount=Sum('total_price'))
+
+
+        total_amount_received = total_offer_price_amount.get('total_price', 0)
+        
+        total_amount_received //= 1000
+
+        order_details_last_week = Order.objects.filter(created_at__gte=one_week_ago)
+
+        order_details_last_week = order_details_last_week.count()
+        # Calculate the total offer price for order details from last week
+        # total_amount_received_last_week_details = order_details_last_week.aggregate(total_offer_price_amount=Sum('total_price'))
+
+        # total_amount_received_last_week = total_amount_received_last_week_details['total_price'] or 0  # Handle None case
+        # total_amount_received_last_week //= 1000
+
+        main_categories = category.objects.annotate(num_product_variants=Count('name'))
+
+        category_labels = [category.name for category in main_categories]
+        category_data = [category.num_product_variants for category in main_categories]
+
+        total_products = ProductVariant.objects.count()
+
+        time_interval = request.GET.get('time_interval', 'all') # Default to "all" if we're not provided anything
+        if time_interval == 'yearly':
+            orders = Order.objects.annotate(date_truncated=TruncYear('created_at', output_field=DateField()))
+            orders = orders.values('date_truncated').annotate(total_amount=Sum('total_price'))
+        elif time_interval == 'monthly':
+            orders = Order.objects.annotate(date_truncated=TruncMonth('created_at',output_field=DateField()))
+            orders = orders.values('date_truncated').annotate(total_amount=Sum('offer_price'))
+
+        monthly_sales = Order.objects.annotate(month=TruncMonth('created_at')).values('month').annotate(total_amount=Sum('total_price')).order_by('month')
+        monthly_labels = [entry['month'].strftime('%B %Y') for entry in monthly_sales]
+        monthly_data = [float(entry['total_amount'])for entry in monthly_sales]
+        monthly_data = [float(entry['total_amount']) for entry in monthly_sales]
+
+
+        headers=HttpHeaders(request.headers)
+        is_ajax_request = headers.get('X-Requested-With')=='XMLHttpRequest'
+
+        if is_ajax_request and request.method == 'GET':
+            time_interval = request.GET.get('time_interval', 'all')
+            filtered_labels = []
+            filtered_data = []
+
+            if time_interval == 'yearly':
+                filtered_orders = Order.objects.annotate(
+                    date_truncated=TruncYear('created_at', output_field=DateField())
+                )
+            elif time_interval =='monthly':
+                filtered_orders = Order.objects.annotate(
+                    date_truncated=TruncMonth('created_at',output_field=DateField())
+                )
+            else:
+                filtered_orders = Order.objects.annotate(date_truncated=F('created_at'))
+
+
+            filtered_orders = filtered_orders.values('date_truncated')
+
+            filtered_orders = filtered_orders.values('date_truncated').annotate(total_amount=Sum('offer_price')).order_by('date_truncated')
+            filtered_labels = [entry['date_truncated'].strftime('%B %Y') for entry in filtered_orders]
+            filtered_data = [float(entry['total_amount']) for entry in filtered_orders]
+            return JsonResponse({"labels": filtered_labels, "data": filtered_data})
+        
+
+
+
+
+        context={
+            'top_products':top_products,
+            'monthly_revenue':monthly_revenue,
+            'yearly_revenue':yearly_revenue,
+            "top_products": top_products,
+            "labels": json.dumps(labels),
+            "data": json.dumps(data),
+            "total_customers": total_customers,
+            "new_users_last_week": new_users_last_week,
+            "total_orders": total_orders,
+            
+            "total_amount_received": total_amount_received,
+            
+            "total_products": total_products,
+            "category_labels": json.dumps(category_labels),
+            "category_data": json.dumps(category_data),
+            "monthly_labels": json.dumps(monthly_labels),
+            "monthly_data": json.dumps(monthly_data),
+        }
+
+        if request.method == "GET":
+        # Get the start and end dates from the request GET parameters
+            from_date_str = request.GET.get('from_date')
+            to_date_str = request.GET.get('to_date')
+
+            if from_date_str and to_date_str:
+                from_date = datetime.strptime(from_date_str, '%Y-%m-%d')
+                to_date = datetime.strptime(to_date_str, '%Y-%m-%d')
+    
+                filtered_orders = Order.objects.filter(created_at_date_range=[from_date, to_date])
+                filtered_customers_details = CustomUser.objects.filter(created_date_range=[from_date, to_date])
+            else:
+            # Provide a default value for from_date and to_date if they are not provided in the request
+                from_date = None
+                to_date = None
+        else:
+    # Provide a default value for from_date and to_date if the request method is not GET
+            from_date = None
+            to_date = None
+        
+        
+        if filtered_orders:
+            order_count = filtered_orders.count()
+        else:
+            pass
+    
+        # if filtered_customers_details:
+        #     filtered_customers = filtered_customers_details.count()
+
+        # total_amount_received = filtered_orders.aggregate(total_offer_price=Sum('total_price'))
+
+        # total_amount = total_amount_received['total_price'] or 0
+        # total_amount //= 1000
+
+        # data = []
+        # labels = []
+        # for order in filtered_orders:
+        #     data.append(float(order.total_price))
+        #     labels.append(str(order.id))
+
+        recent_orders=Order.objects.order_by('-id')[:5]
+        # Update the context with filtered data
+        context.update({
+            # 'total_orders': order_count,
+            # 'total_amount_received': total_amount,
+            # 'total_customers' : filtered_customers,
+            "labels": json.dumps(labels),
+            'data': json.dumps(data),
+            'recent_orders':recent_orders,
+        })
+
+
+        return render(request,'admin_auth/index.html',context)
     return redirect('admin_login')
 
 # ----------------------------------------------------------------User_manaagement---------------------------------pending work session management
@@ -95,3 +299,121 @@ def admin_logout(request):
     if 'email' in request.session:
         request.session.flush()
     return redirect('admin_login')
+
+def filter_sales(request):
+    time_interval = request.GET.get('time_interval', 'all')
+
+    if time_interval == 'yearly':
+        # Filter data for yearly sales
+        filtered_data = Order.objects.annotate(
+            date_truncated=TruncYear('created_at')
+        ).values('date_truncated').annotate(total_amount=Sum('amount')).order_by('date_truncated')
+
+    elif time_interval == 'monthly':
+        # Filter data for monthly sales
+        filtered_data = Order.objects.annotate(
+            date_truncated=TruncMonth('created_at')
+        ).values('date_truncated').annotate(total_amount=Sum('amount')).order_by('date_truncated')
+
+    else:
+        # Default to 'all' or handle other time intervals as needed
+        # Here, we are using DateTrunc to truncate the date to a day
+        filtered_data = Order.objects.annotate(
+            date_truncated=TruncDate('day', 'date')
+        ).values('date_truncated').annotate(total_amount=Sum('amount')).order_by('date_truncated')
+
+    # Extract data for the filtered chart
+    filtered_labels = [entry['date_truncated'].strftime('%B %Y') for entry in filtered_data]
+    filtered_data = [float(entry['total_amount']) for entry in filtered_data]
+
+    return JsonResponse({"labels": filtered_labels, "data": filtered_data})
+
+
+
+
+
+def report_generator(request, orders):
+    from_date_str = request.POST.get('from_date')
+    to_date_str = request.POST.get('to_date')
+
+    from_date = datetime.strptime(from_date_str, '%Y-%m-%d').date()
+    to_date = datetime.strptime(to_date_str, '%Y-%m-%d').date()
+
+    if from_date > date.today() or to_date > date.today():
+        # Return an error response or show a message
+        return HttpResponse('Please enter a valid date.')
+
+    buf = BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=18)
+    story = []
+
+    data = [["Order ID", "Total Quantity", "Product IDs", "Product Names", "Amount"]]
+
+    total_sales_amount = 0  # Initialize total sales amount sum
+
+    for order in orders:
+        # Retrieve order items associated with the current order
+        order_items = OrderItem.objects.filter(order=order)
+        total_quantity = sum(item.quantity for item in order_items)
+        product_ids = ', '.join(str(item.product.id) for item in order_items)
+        product_names = ', '.join(f"{item.product.brand.brand_name} {item.product.title}" for item in order_items)
+        order_amount = sum(item.price for item in order_items)
+
+        total_sales_amount += order_amount  # Accumulate total sales amount
+
+        data.append([order.id, total_quantity, product_ids, product_names, order_amount])
+
+    # Add a row for the total sales amount at the end of the table
+    data.append(["Total Sales", "", "", "", total_sales_amount])
+
+    # Create a table with the data
+    table = Table(data, colWidths=[1 * inch, 1.5 * inch, 2 * inch, 3 * inch, 1 * inch])
+
+    # Style the table
+    table_style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.gray),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -2), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, -1), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ])
+    table.setStyle(table_style)
+
+    # Add the table to the story and build the document
+    story.append(table)
+    doc.build(story)
+
+    buf.seek(0)
+    return FileResponse(buf, content_type='application/pdf')
+
+
+
+
+
+
+
+
+def report_pdf_order(request):
+    if request.method == 'POST':
+        from_date_str = request.POST.get('from_date')
+        to_date_str = request.POST.get('to_date')
+
+        try:
+            from_date = datetime.strptime(from_date_str, '%Y-%m-%d').date()
+            to_date = datetime.strptime(to_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return HttpResponse('Invalid date format.')
+
+        orders = Order.objects.filter(created_at__date__range=[from_date, to_date]).order_by('-id')
+        print("yyyyyyyyy", orders)
+        return report_generator(request, orders)
+    
+    

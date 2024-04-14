@@ -1,6 +1,29 @@
 $(function () {
+  // =====================================
+  // Profit
+  // =====================================
+  // Your backend should pass monthly_revenue and yearly_revenue variables here
 
+  var monthlyRevenueData = []; // Placeholder for monthly revenue data
+  var yearlyRevenueData = []; // Placeholder for yearly revenue data
 
+  // Populate monthly and yearly revenue data from backend
+  {% for item in monthly_revenue %}
+    monthlyRevenueData.push({ month: "{{ item.month }}", total_revenue: {{ item.total_revenue }} });
+  {% endfor %}
+
+  {% for item in yearly_revenue %}
+    yearlyRevenueData.push({ year: "{{ item.year }}", total_revenue: {{ item.total_revenue }} });
+  {% endfor %}
+
+  var chart = {
+    // Your chart configuration goes here
+    // Use monthlyRevenueData and yearlyRevenueData to populate the chart data
+  };
+
+  // Render your chart using ApexCharts
+  var chart = new ApexCharts(document.querySelector("#chart"), chart);
+  chart.render();
   // =====================================
   // Profit
   // =====================================

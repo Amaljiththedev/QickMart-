@@ -13,6 +13,7 @@ class Products(models.Model):
     category = models.ForeignKey(Category, related_name='category_name', on_delete=models.CASCADE)
     description = models.TextField()
     price = models.PositiveIntegerField(null=True)
+    offer_price = models.PositiveIntegerField(null=True)
     brand = models.ForeignKey(Brand, related_name='Brand_name', on_delete=models.CASCADE)
     status = models.CharField(max_length=100, choices=Status_choices)
     stock_count = models.IntegerField(default=0)

@@ -9,6 +9,7 @@ urlpatterns = [
 
     path('',admin_login,name='admin_login'),
     path('dashboard/',dashboard,name='dashboard'),
+    path('generate-pdf-report/', report_pdf_order, name='generate_pdf_report'),
     path('usermanagement/',User_management,name='user_management'),
     path('status/<int:user_id>/block/',block,name='block_status'),
     path('status/<int:user_id>/unblock/',unblock,name='unblock_status'),
