@@ -35,6 +35,8 @@ urlpatterns = [
     path('success/',views.success,name="success"),
     path('razor_pay/',views.razor_payment,name="razor_payment"),
     path('change_password/',views.reset_password,name="reset_passwords"),
+    path('razorpay/callback/', views.razorpay_callback, name='razorpay_callback'),
+
     
 
 ]

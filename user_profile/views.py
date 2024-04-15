@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse
 from Qickmart import settings
 from category.models import Brand
+from inventory.models import Coupon
 from products.models import Products
 from registration.views import generate_otp
 from user_auth.models import CustomUser 
@@ -20,6 +21,9 @@ from django.contrib import messages
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout
+from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
+
 
 
 
@@ -186,6 +190,7 @@ def add_to_cart(request):
             if not created:
                 cart_item.product_quantity += int(quantity)
                 cart_item.save()
+            print(cart_item.product.price)
 
             # Update the stock count of the product
 
@@ -240,27 +245,45 @@ def update_cart_quantity(request):
 def show_cart(request):
     # Retrieve the current user's cart items
     cart_items = Cart.objects.filter(user=request.user)
-    
-    # Calculate the maximum stock count plus one
-    stock_count_plus_one = None
-    
-    if cart_items:
-        stock_counts = {item.product_id: item.product.stock_count for item in cart_items}
-        # Ensure that product.stock_count is not None and calculate the maximum
-        stock_count_plus_one = max(stock_counts.values()) if all(stock_counts.values()) else 1
-    
+    total_price = sum(item.product.price * item.product_quantity for item in cart_items)
+
+    Coupon_discount = 0
+
+    if request.method == 'POST':
+        coupon_code = request.POST.get('coupon_code')
+        try:
+            coupon = Coupon.objects.get(code=coupon_code)
+            print("Coupon information:", coupon.code, coupon.discount_type, coupon.discount_value)  # Debug coupon information
+            if coupon.discount_type == 'percentage':
+                Coupon_discount = (total_price * coupon.discount_value) / 100
+                print(Coupon_discount)
+            elif coupon.discount_type == 'fixed_amount':
+                Coupon_discount = coupon.discount_value
+                print(total_price)
+        except Coupon.DoesNotExist:
+            print("Coupon not found")
+            pass  # Handle invalid coupon code here
+
+        for item in cart_items:
+            item.coupon_discount_amount = Coupon_discount
+
     # Calculate total price for each cart item
     for item in cart_items:
-        item.total_price = item.product.price * item.product_quantity
-    
-    # Pass the cart items and stock_count_plus_one to the template as context
+        item.total_price = item.product.price * item.product_quantity - item.coupon_discount_amount
+        item.save()
+
+    print(total_price)
+
+    # Pass the cart items, total price, and coupon code to the template as context
     context = {
         'cart_items': cart_items,
-        'stock_count_plus_one':stock_count_plus_one,
+        'total_price': total_price,
+        'coupon_code': coupon_code if 'coupon_code' in locals() else None,
     }
 
     # Pass the cart items to the template
     return render(request, 'user_auth/cart.html', context)
+
 
 
 
@@ -294,32 +317,19 @@ def checkout(request):
         
         # Retrieve cart items from the Cart model for the current user
         cart = Cart.objects.filter(user=user)
-        
+        total_amount = 0 
         # Calculate the total price for each cart item and print quantity of each product
         for item in cart:
-            item.total_price = item.product.price * item.product_quantity
+            item.total_price = item.product.price * item.product_quantity - item.coupon_discount_amount
+            total_amount += item.total_price
+            print(item.coupon_discount_amount)
             print(f"Product:, Quantity: {item.product_quantity}")
         
-        # Calculate the total price for all cart items
-        mtotal = sum(item.total_price for item in cart)
-        print(mtotal)
-        payments= client.order.create({
-            "amount": mtotal*100,
-            "currency": "INR",
-            "payment_capture": 1
-        })
-        print(mtotal)
-        print(payments)
-
-        order_id=payments['id']
-        # Pass saved addresses, cart items, payment modes, and total to the template context
         context = {
             'addresses': addresses,
             'cart': cart,
             'payment_modes': payment_modes,
-            'total': mtotal,
-            'order_id': order_id,
-            'payments': payments,
+            'total_amount': total_amount,
         }
         
         # Render the checkout template with the context
@@ -333,7 +343,8 @@ def confirm_orders(request):
         address_id = request.POST.get('saved_address')
         payment_method = request.POST.get('payment_method')
         cart = Cart.objects.filter(user=user)
-        total_price = sum(item.product.price * item.product_quantity for item in cart)
+        total_price = sum(item.product.price * item.product_quantity - item.coupon_discount_amount for item in cart)
+        print(total_price)
         payments = request.POST.get('payments')
         order_id = request.POST.get('order_id')
 
@@ -364,16 +375,20 @@ def confirm_orders(request):
                 order=order,
                 product=item.product,
                 quantity=item.product_quantity,
-                price=item.product.price
+                price=item.product.price * item.product_quantity - item.coupon_discount_amount
+
             )
 
         # Clear the cart
-        cart.delete()
+
+
+        
+
+
         if payment_method == 'walletbalance':
             # Redirect to wallet_payment with order_id
             return redirect('user_profile:wallet_payment', order_id=order.id)
-        elif payment_method == 'Razor Pay':
-            return HttpResponseRedirect(reverse('user_profile:razor_payment') + f'?payments={payments}&order_id={order_id}')
+
 
         messages.success(request, 'Order placed successfully.')
         return redirect('user_profile:order_confirmation', order_id=order.id)
@@ -395,7 +410,9 @@ def confirm_orders(request):
 
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    order_items = order.orderitem_set.all()  # Fetch related OrderItem objects
+    order_items = order.orderitem_set.all() 
+    cart = Cart.objects.filter(user=user) # Fetch related OrderItem objects
+    cart.delete()
     context = {
         'order': order,
         'order_items': order_items,  # Pass the order items to the template
@@ -437,6 +454,7 @@ def track_order(request):
     # Retrieve orders for the logged-in user
     user = request.user  # Assuming you're using Django's built-in authentication system
     orders = Order.objects.filter(user=user)
+
     
     context = {
         'orders': orders,
@@ -446,12 +464,18 @@ def track_order(request):
 def wallet_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order_items = order.orderitem_set.all()
+    cart = Cart.objects.filter(user=request.user)
+ # Fetch related OrderItem objects
+    
 
     user_profile = request.user  # Assuming user profile is associated with the user
 
     if request.method == 'POST':
         wallet_balance = user_profile.wallet_balance
-        total_price = order.total_price
+        total_price = order.total_price 
+
+        for x in cart:
+            total_price -= x.coupon_discount_amount
 
         if wallet_balance >= total_price and wallet_balance > 0:
             user_profile.wallet_balance -= total_price
@@ -463,7 +487,7 @@ def wallet_payment(request, order_id):
         else:
             messages.error(request, 'Insufficient funds in wallet.')
             return redirect('user_profile:wallet_payment', order_id=order.id)
-
+    cart.delete()
     context = {
         'order': order,
         'order_items': order_items,
@@ -511,6 +535,7 @@ def success(request):
     if request.method=='POST':
         a=request.POST
         order_id =""
+        
 
         for key,val in a.items():
             if key== "razor_order_id":
@@ -520,9 +545,7 @@ def success(request):
         user=Order.objects,filter(razorpay_order_id_id=order_id).first()
         user.paid=True
         user.save()
-
-
-
+        print('hheellllooooo')
 
     return render(request,'user_auth/success.html')
 
@@ -576,3 +599,46 @@ def reset_password(request):
     if request.user.is_authenticated:
         logout(request)
         return redirect('forget_password')
+    
+
+
+@csrf_exempt
+def razorpay_callback(request):
+    if request.method == 'POST':
+        # Process the callback data from Razorpay
+        data = request.POST  
+        print(data)
+        
+        # Retrieve cart items for the current user
+        cart_items = Cart.objects.filter(user=request.user)
+        
+        # Calculate total price based on cart items
+        total_price = sum(cart_item.product.price for cart_item in cart_items)
+        
+        # Create a new order object with the total price
+        with transaction.atomic():
+            order = Order.objects.create(
+                user=request.user,
+                total_price=total_price,
+                payment_method='Razorpay', # Assuming Razorpay is the payment method
+                paid=True
+            )
+            
+            # Create order items for each cart item
+            for cart_item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=cart_item.product,
+                    quantity=cart_item.product_quantity,
+                    price=cart_item.product.price
+                    # Add other relevant fields
+                )
+        
+        # Clear the cart after creating the order
+        cart_items.delete()
+        
+        # Return a JSON response indicating successful processing of the callback
+        return render(request, 'user_auth/success.html',)
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'status': 'error', 'message': 'Only POST method is allowed'}, status=405)

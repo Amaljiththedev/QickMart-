@@ -131,6 +131,9 @@
                             </select>
                         </div>
                         <button id="confirm-orders-button" type="submit" class="btn btn-primary btn-block mt-3">Confirm Orders</button>
+
+                        <button id="razorpaybtn" type="button" class="razorpay">
+                            <span></span>Pay with razorpay</button>
                     </div>
                     <div class="row">
                         <div class="col-12">
@@ -153,7 +156,43 @@
     </div>
 </div>
 {% endif %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
+<script>
+    $(document).ready(function() {
+        $('#razorpaybtn').click(function (e){
+            e.preventDefault();
+            var totalAmount = {{ total_amount }}; // Get total amount from Django context
+            
+            if (totalAmount > 0) {
+                var options = {
+                    "key": "rzp_test_G7fjGttWAWG2Bd", // Replace with your Razorpay Key ID
+                    "amount": totalAmount * 100, // Amount is in currency subunits. Convert to paisa
+                    "currency": "INR",
+                    "name": "QickMart", // Your business name
+                    "description": "Test Transaction",
+                    "image": "", // URL of your business logo
+                    "callback_url": "{% url 'user_profile:razorpay_callback' %}",
+                    "prefill": {
+                        "name": "", // Your customer's name
+                        "email": "gaurav.kumar@example.com",
+                        "contact": "9000090000" // Your customer's phone number
+                    },
+                    "theme": {
+                        "color": "#3399cc" // Customize the Razorpay Checkout theme color
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+
+                // Open Razorpay Checkout when the button is clicked
+                rzp1.open();
+            } else {
+                alert('Cart is empty!');
+            }
+        });
+    });
+</script>
 
 
 {% endblock %}
+

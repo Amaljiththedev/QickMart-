@@ -194,53 +194,37 @@ def dashboard(request):
             to_date_str = request.GET.get('to_date')
 
             if from_date_str and to_date_str:
-                from_date = datetime.strptime(from_date_str, '%Y-%m-%d')
-                to_date = datetime.strptime(to_date_str, '%Y-%m-%d')
-    
-                filtered_orders = Order.objects.filter(created_at_date_range=[from_date, to_date])
-                filtered_customers_details = CustomUser.objects.filter(created_date_range=[from_date, to_date])
-            else:
-            # Provide a default value for from_date and to_date if they are not provided in the request
-                from_date = None
-                to_date = None
-        else:
-    # Provide a default value for from_date and to_date if the request method is not GET
-            from_date = None
-            to_date = None
+                from_date = datetime.strptime(from_date_str, '%Y-%m-%d').date()
+                to_date = datetime.strptime(to_date_str, '%Y-%m-%d').date()
+
+                filtered_orders = Order.objects.filter(created_at__date__range=[from_date, to_date])
+                filtered_customers = CustomUser.objects.filter(date_joined__date__range=[from_date, to_date])
+
+                order_count = filtered_orders.count()
+                total_amount_received = filtered_orders.aggregate(total_price_sum=Sum('total_price'))
+                total_amount = total_amount_received.get('total_price_sum', 0)
+                
+                if total_amount_received is not None and total_amount_received['total_price_sum'] is not None:
+                    total_amount = total_amount_received['total_price_sum'] // 1000  # Assuming you're dealing with currency values
+                else:
+                    total_amount = 0
+            
+                data = [float(order.total_price) for order in filtered_orders]
+                labels = [str(order.id) for order in filtered_orders]
+
+                recent_orders = Order.objects.order_by('-id')[:5]
+
+            # Update the context with filtered data
+            context.update({
+                'total_orders': order_count,
+                'total_amount_received': total_amount,
+                'total_customers': filtered_customers.count(),
+                "labels": json.dumps(labels),
+                'data': json.dumps(data),
+                'recent_orders': recent_orders,
+            })
         
-        
-        if filtered_orders:
-            order_count = filtered_orders.count()
-        else:
-            pass
-    
-        # if filtered_customers_details:
-        #     filtered_customers = filtered_customers_details.count()
-
-        # total_amount_received = filtered_orders.aggregate(total_offer_price=Sum('total_price'))
-
-        # total_amount = total_amount_received['total_price'] or 0
-        # total_amount //= 1000
-
-        # data = []
-        # labels = []
-        # for order in filtered_orders:
-        #     data.append(float(order.total_price))
-        #     labels.append(str(order.id))
-
-        recent_orders=Order.objects.order_by('-id')[:5]
-        # Update the context with filtered data
-        context.update({
-            # 'total_orders': order_count,
-            # 'total_amount_received': total_amount,
-            # 'total_customers' : filtered_customers,
-            "labels": json.dumps(labels),
-            'data': json.dumps(data),
-            'recent_orders':recent_orders,
-        })
-
-
-        return render(request,'admin_auth/index.html',context)
+        return render(request, 'admin_auth/index.html', context)
     return redirect('admin_login')
 
 # ----------------------------------------------------------------User_manaagement---------------------------------pending work session management

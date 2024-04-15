@@ -18,6 +18,7 @@ class Cart(models.Model):
     product=models.ForeignKey(Products, on_delete=models.CASCADE,null=True,blank=True)
     product_quantity=models.IntegerField(default=1, null=True,blank=False)
     created_date=models.DateField(default=timezone.now)
+    coupon_discount_amount=models.IntegerField(default=0, null=True, blank=False)
     
 class payment(models.Model):
     PAYMENT_CHOICES = [
