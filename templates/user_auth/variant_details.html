@@ -121,102 +121,83 @@
 
 </style>
 
-<div class="content-wraper">
+
+<div class="content-wrapper">
     <div class="container">
+        <!-- Product details section -->
         <div class="row single-product-area">
+            <!-- Product images -->
             <div class="col-lg-5 col-md-6">
                 <!-- Product Details Left -->
+                <!-- Your product images code -->
                 <div class="product-details-left">
                     <div class="product-details-images slider-navigation-1">
-                        {% for image in product_images %}
                         <div class="lg-image">
-                            <a class="popup-img venobox vbox-item" href="{{ image.image.url }}" data-gall="myGallery">
-                                <img src="{{ image.image.url }}" alt="product image">
+                            <a class="popup-img venobox vbox-item" href="{{ variant.product_images.first.image.url }}" data-gall="myGallery">
+                                <img src="{{ variant.product_images.first.image.url }}" alt="product image">
                             </a>
                         </div>
-                        {% endfor %}
-                    </div>
-                    <div class="product-details-thumbs slider-thumbs-1">
-                        {% for image in product_images %}
-                        <div class="sm-image">
-                            <img src="{{ image.image.url }}" alt="product image thumb">
-                        </div>
-                        {% endfor %}
                     </div>
                 </div>
-                <!--// Product Details Left -->
             </div>
 
+            <!-- Product details -->
             <div class="col-lg-7 col-md-6">
+                <!-- Product Details Right -->
+                <!-- Your product details code -->
                 <div class="product-details-view-content pt-60">
                     <div class="product-info">
-                        <h2> {{ product.title|truncatewords:30}}</h2>
-                        <span class="product-details-ref">Reference: demo_15</span>
-                        <div class="rating-box pt-20">
-                            <ul class="rating rating-with-review-item">
-                                <li><i class="fa fa-star-o"></i></li>
-                                <li><i class="fa fa-star-o"></i></li>
-                                <li><i class="fa fa-star-o"></i></li>
-                                <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                <li class="no-star"><i class="fa fa-star-o"></i></li>
-                                <li class="review-item"><a href="#">Read Review</a></li>
-                                <li class="review-item"><a href="#">Write Review</a></li>
-                            </ul>
-                        </div>
+                        <h2>{{ variant.product.title }}</h2>
+                        <span class="product-details-ref">Reference: {{ variant.id }}</span>
+                        <!-- Product price -->
                         <div class="price-box pt-20">
-                            <span class="new-price new-price-2">₹{{ product.price }}</span>
+                            <span class="new-price new-price-2">₹{{ variant.price }}</span>
                         </div>
+                        <!-- Product description -->
                         <div class="product-desc">
                             <p>
-                                <span>{{ product.description|safe }}
-                                </span>
+                                <span>{{ variant.product.description|safe }}</span>
                             </p>
                         </div>
-
-                        
-                        <div class="product-variants">
-                            {% for variant_product in variants %}
-                            <a href="{% url 'user_auth:variant_details' variant_product.id %}">
-                                <div class="variant-item" onclick="showVariantDetails({{ variant_product.id }})">
-                                    <div class="variant-thumbnail">
-                                        <img src="{{ variant_product.product_images.first.image.url }}" alt="Product Image">
-                                        <span class="color-name">{{ variant_product.color }}</span>
-                                    </div>
-                                    <div class="variant-details">
-                                        <span class="variant-size">{{ variant_product.ram }}</span> RAM <br>
-                                        <span class="variant-storage">{{ variant_product.internal_storage }}</span> Storage
-                                    </div>
-                                </div>
-                            </a>
-                            {% endfor %}
-                        </div>
-                        <div id="variant-details-container"></div>
-                        
-                        
-                        <div class="single-add-to-cart">
-                            <form action="#" class="cart-quantity">
-                                <div class="quantity">
-                                    <label>Quantity</label>
-                                    <div class="cart-plus-minus">
-                                        <input class="cart-plus-minus-box" value="1" type="text">
-                                        <div class="dec qtybutton"><i class="fa fa-angle-down"></i></div>
-                                        <div class="inc qtybutton"><i class="fa fa-angle-up"></i></div>
-                                    </div>
-                                </div>
-                                <button class="add-to-cart" type="button" data-product-id="{{ product.id }}">Add to cart</button>
-                            </form>
-                        </div>
+                        <!-- Additional product info -->
                         <div class="product-additional-info pt-25">
-                            <a class="wishlist-btn" href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a>
-                            <div class="product-social-sharing pt-25">
-                                <ul>
-                                    <li class="facebook"><a href="#"><i class="fa fa-facebook"></i>Facebook</a></li>
-                                    <li class="twitter"><a href="#"><i class="fa fa-twitter"></i>Twitter</a></li>
-                                    <li class="google-plus"><a href="#"><i class="fa fa-google-plus"></i>Google +</a></li>
-                                    <li class="instagram"><a href="#"><i class="fa fa-instagram"></i>Instagram</a></li>
-                                </ul>
-                            </div>
+                            <span class="variant-size">{{ variant.ram }}</span> RAM <br>
+                            <span class="variant-storage">{{ variant.internal_storage }}</span> Storage <br>
+                            <span class="variant-inch">{{ variant.inch }}</span> Inch <br>
+                            <span class="color-name">{{ variant.color }}</span> Color
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional product actions -->
+        <div class="single-add-to-cart">
+            <form action="#" class="cart-quantity">
+                <div class="quantity">
+                    <label>Quantity</label>
+                    <div class="cart-plus-minus">
+                        <input class="cart-plus-minus-box" value="1" type="text">
+                        <div class="dec qtybutton"><i class="fa fa-angle-down"></i></div>
+                        <div class="inc qtybutton"><i class="fa fa-angle-up"></i></div>
+                    </div>
+                </div>
+                <button class="add-to-cart" type="button" data-product-id="{{ product.id }}">Add to cart</button>
+            </form>
+        </div>
+
+        <!-- Product additional actions -->
+        <div class="product-additional-info pt-25">
+            <a class="wishlist-btn" href="wishlist.html"><i class="fa fa-heart-o"></i>Add to wishlist</a>
+            <div class="product-social-sharing pt-25">
+                <ul>
+                    <li class="facebook"><a href="#"><i class="fa fa-facebook"></i>Facebook</a></li>
+                    <li class="twitter"><a href="#"><i class="fa fa-twitter"></i>Twitter</a></li>
+                    <li class="google-plus"><a href="#"><i class="fa fa-google-plus"></i>Google +</a></li>
+                    <li class="instagram"><a href="#"><i class="fa fa-instagram"></i>Instagram</a></li>
+                </ul>
+            </div>
+        </div>
                         <div class="block-reassurance">
                             <ul>
                                 <li>

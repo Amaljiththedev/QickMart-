@@ -23,6 +23,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
+from django.db.models import Max
+
 
 
 
@@ -204,50 +206,52 @@ def add_to_cart(request):
         return JsonResponse({'error': 'User is not authenticated.'}, status=403)
     
 
-
 def update_cart_quantity(request):
     try:
         print("Received AJAX request to update cart quantity")
         if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
             product_id = request.POST.get('product_id')
             new_quantity = int(request.POST.get('quantity'))
-            print(F'THIS IS NEW QUANTITY', new_quantity)
+            print("THIS IS NEW QUANTITY", new_quantity)
 
-            cart_item = get_object_or_404(Cart, product_id=product_id)
+            # Retrieve the product object
+            product = get_object_or_404(Products, id=product_id)
 
-            # Calculate the difference between the new quantity and the existing quantity in the cart
-            quantity_diff = new_quantity - cart_item.product_quantity
+            # Get or create the cart item for the user and product
+            cart_item, created = Cart.objects.get_or_create(user=request.user, product=product)
+            
+            if created:
+                print("New cart item created")
+            
+            # Update the cart item quantity
             cart_item.product_quantity = new_quantity
             cart_item.save()
-            if quantity_diff > cart_item.product.stock_count:
-                return JsonResponse({'error': 'Requested quantity exceeds available stock count.'}, status=400)
-
-            # Update the stock count
-            # remaining_stock = cart_item.product.stock_count - quantity_diff
-            # print(F'THIS IS REMAINING', remaining_stock)
-            # cart_item.product.stock_count = remaining_stock
-            # cart_item.product.save()
-
-            # Update the cart item quantity
-            # cart_item.product_quantity = new_quantity
-            # print(F'UPDATED QUANTITY', cart_item.product_quantity)
-            # cart_item.save()
 
             # Calculate the total price
-            total_price = cart_item.product.price * new_quantity
+            total_price = product.price * new_quantity
 
-            return JsonResponse({'success': 'Cart quantity updated successfully', 'total_price': total_price, 'remaining_stock': remaining_stock})
+            # Return JSON response with updated details
+            return JsonResponse({'success': 'Cart quantity updated successfully', 'total_price': total_price})
+            
         else:
             return JsonResponse({'error': 'Invalid request'}, status=400)
+    except ValueError:
+        return JsonResponse({'error': 'Invalid quantity value'}, status=400)
     except Exception as e:
+        print("Error:", e)
         return JsonResponse({'error': 'Internal server error.'}, status=500)
 
 def show_cart(request):
     # Retrieve the current user's cart items
     cart_items = Cart.objects.filter(user=request.user)
     total_price = sum(item.product.price * item.product_quantity for item in cart_items)
-
     Coupon_discount = 0
+
+    # Calculate stock_count_plus_one for each product in the cart
+    max_stock_count_plus_one = Products.objects.aggregate(Max('stock_count'))['stock_count__max']
+    # If there are no products or if the stock count is not available, default to 1
+    stock_count_plus_one = max_stock_count_plus_one or 1
+
 
     if request.method == 'POST':
         coupon_code = request.POST.get('coupon_code')
@@ -279,6 +283,7 @@ def show_cart(request):
         'cart_items': cart_items,
         'total_price': total_price,
         'coupon_code': coupon_code if 'coupon_code' in locals() else None,
+        'stock_count_plus_one': stock_count_plus_one,
     }
 
     # Pass the cart items to the template
@@ -539,7 +544,7 @@ def success(request):
 
         for key,val in a.items():
             if key== "razor_order_id":
-                order_id=val
+                order_id=valht
                 break
 
         user=Order.objects,filter(razorpay_order_id_id=order_id).first()

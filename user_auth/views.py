@@ -9,6 +9,10 @@ from django.db.models import Q,Count
 from django.http import JsonResponse
 
 from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+
+
 
 
 # Create your views here.
@@ -168,27 +172,16 @@ def search(request):
     return render(request, 'user_auth/search.html', context)
 
 
-def get_variant_details(request):
-    if request.method == 'GET':
-        variant_id = request.GET.get('variant_id')
-        try:
-            variant = ProductVariant.objects.get(pk=variant_id)
-            # Get all images associated with the variant
-            
-            # Construct a dictionary containing variant details
-            variant_details = {
-                'price': variant.price,
-                'stock_count': variant.stock_count,
-                'ram': variant.ram,
-                'internal_storage': variant.internal_storage,
-                'inch': variant.inch,
-                'color': variant.color,
-                # 'images': images,  # Include all image URLs
-            }
-            print(variant_details.values())
-            return JsonResponse(variant_details)
-        except ProductVariant.DoesNotExist:
-            return JsonResponse({'error': 'Variant not found'}, status=404)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=400)
-    
+def get_variant_details(request, variant_id):
+    variant = get_object_or_404(ProductVariant, id=variant_id)
+    # You can customize the data you want to return here
+    variant_data = {
+        'id': variant.id,
+        'price': variant.price,
+        'ram': variant.ram,
+        'internal_storage': variant.internal_storage,
+        'inch': variant.inch,
+        'color': variant.color,
+    }
+    return render(request, 'user_auth/variant_details.html', {'variant': variant})
+

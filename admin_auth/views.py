@@ -72,7 +72,11 @@ def admin_login(request):
 @login_required
 def dashboard(request):
     if 'email' in request.session:
-        top_products = Products.objects.annotate(total_orders=Count('orderitem__order')).order_by('-total_orders')[:5]
+        order_count=0
+        total_amount=0
+        filtered_customers=0
+        recent_orders=None
+        top_products = Products.objects.annotate(total_orders=Count('orderitem__order')).order_by('-total_orders')[:10]
         monthly_revenue = Order.objects.filter().annotate(
             month=TruncMonth('created_at')
 
@@ -199,7 +203,12 @@ def dashboard(request):
 
                 filtered_orders = Order.objects.filter(created_at__date__range=[from_date, to_date])
                 filtered_customers = CustomUser.objects.filter(date_joined__date__range=[from_date, to_date])
+                if isinstance(filtered_customers, int):
+                    total_customers = filtered_customers
+                else:
+                    total_customers = filtered_customers.count()
 
+                
                 order_count = filtered_orders.count()
                 total_amount_received = filtered_orders.aggregate(total_price_sum=Sum('total_price'))
                 total_amount = total_amount_received.get('total_price_sum', 0)
@@ -213,12 +222,12 @@ def dashboard(request):
                 labels = [str(order.id) for order in filtered_orders]
 
                 recent_orders = Order.objects.order_by('-id')[:5]
-
+            print(type(filtered_customers))
             # Update the context with filtered data
             context.update({
                 'total_orders': order_count,
                 'total_amount_received': total_amount,
-                'total_customers': filtered_customers.count(),
+                'total_customers': total_customers,
                 "labels": json.dumps(labels),
                 'data': json.dumps(data),
                 'recent_orders': recent_orders,
@@ -226,7 +235,6 @@ def dashboard(request):
         
         return render(request, 'admin_auth/index.html', context)
     return redirect('admin_login')
-
 # ----------------------------------------------------------------User_manaagement---------------------------------pending work session management
 @login_required
 def User_management(request):
@@ -336,8 +344,7 @@ def report_generator(request, orders):
     total_sales_amount = 0  # Initialize total sales amount sum
 
     for order in orders:
-        # Retrieve order items associated with the current order
-        order_items = OrderItem.objects.filter(order=order)
+        #rder_items = OrderItem.objects.filter(order=order)
         total_quantity = sum(item.quantity for item in order_items)
         product_ids = ', '.join(str(item.product.id) for item in order_items)
         product_names = ', '.join(f"{item.product.brand.brand_name} {item.product.title}" for item in order_items)
@@ -399,5 +406,5 @@ def report_pdf_order(request):
         orders = Order.objects.filter(created_at__date__range=[from_date, to_date]).order_by('-id')
         print("yyyyyyyyy", orders)
         return report_generator(request, orders)
-    
+
     

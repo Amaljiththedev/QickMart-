@@ -9,86 +9,12 @@
 
 <!-- To include the CSS file -->
   <link rel="stylesheet" href="{% static 'assets/admin_auth/css/styles.min.css' %}" />
-</head>
-<style>
-  {% comment %} /* Card Styles */
-  .card {
-    background-color: #fff;
-    border-radius: 10px;
-    border: none;
-    position: relative;
-    margin-bottom: 30px;
-    box-shadow: 0 0.46875rem 2.1875rem rgba(90, 97, 105, 0.1), 
-                0 0.9375rem 1.40625rem rgba(90, 97, 105, 0.1), 
-                0 0.25rem 0.53125rem rgba(90, 97, 105, 0.12), 
-                0 0.125rem 0.1875rem rgba(90, 97, 105, 0.1);
-  }
-  
-  /* Card Backgrounds */
-  .l-bg-cherry {
-    background: linear-gradient(to right, #493240, #f09);
-    color: #fff;
-  }
-  
-  .l-bg-blue-dark {
-    background: linear-gradient(to right, #373b44, #4286f4);
-    color: #fff;
-  }
-  
-  .l-bg-green-dark {
-    background: linear-gradient(to right, #0a504a, #38ef7d);
-    color: #fff;
-  }
-  
-  .l-bg-orange-dark {
-    background: linear-gradient(to right, #a86008, #ffba56);
-    color: #fff;
-  }
-  
-  .l-bg-cyan {
-    background: linear-gradient(135deg, #289cf5, #84c0ec);
-    color: #fff;
-  }
-  
-  .l-bg-green {
-    background: linear-gradient(135deg, #23bdb8 0%, #43e794 100%);
-    color: #fff;
-  }
-  
-  .l-bg-orange {
-    background: linear-gradient(to right, #f9900e, #ffba56);
-    color: #fff;
-  }
-  
-  /* Card Icons */
-  .card .card-statistic-3 .card-icon-large .fas,
-  .card .card-statistic-3 .card-icon-large .far,
-  .card .card-statistic-3 .card-icon-large .fab,
-  .card .card-statistic-3 .card-icon-large .fal {
-    font-size: 110px;
-  }
-  
-  .card .card-statistic-3 .card-icon {
-    text-align: center;
-    line-height: 50px;
-    margin-left: 15px;
-    color: #000;
-    position: absolute;
-    right: -5px;
-    top: 20px;
-    opacity: 0.1;
-  }
-  
-  /* Form Input Styles */
-  input[type="date"].form-control,
-  input[type="time"].form-control,
-  input[type="datetime-local"].form-control,
-  input[type="month"].form-control {
-    appearance: none;
-  } {% endcomment %}
-  
-</style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Include jQuery library -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+</head>
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6">
 <!-- Sidebar Start -->
 <aside class="left-sidebar">
@@ -248,6 +174,12 @@
   </header>
   <!--  Header End -->
   <div class="container-fluid">
+    <div class="mt-4">
+      <canvas id="myChart"></canvas>
+      <div class="mt-4">
+        <canvas id="myChart"></canvas>
+        <button id="randomize-btn">Randomize Data</button>
+      </div>
     <!--  Row 1 -->
     <div class="row">
       <div class="col-lg-4">
@@ -536,9 +468,7 @@
         </div>
     </div>
 
-    <div class="mt-4">
-        <canvas id="myChart" width="200" height="50"></canvas>
-    </div>
+
     <div class="mt-5"> <h2>Order Report</h2> </div>
     <form action="{% url 'generate_pdf_report' %}" method="POST" onsubmit="return validateDate()">
       {% csrf_token %}
@@ -712,38 +642,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   
   </script>
-  
-  <script>
-  const labels = JSON.parse(`{{ labels|safe }}`);
-  const data = JSON.parse(`{{ data|safe }}`);
-  
-  const ctx = document.getElementById('myChart');
-  const myChart = new Chart(ctx, {
-  type: 'line',
-  data: {
-  labels: labels,
-  datasets: [{
-      label: 'Order Amounts',
-      data: data,
-      borderWidth: 1
-  }]
-  },
-  options: {
-  scales: {
-      y: {
-          beginAtZero: true
-      }
-  }
-  }
-  });
-  
-  // Listen for changes in the dropdown and reload the page with the selected time interval
-  const timeIntervalDropdown = document.getElementById('time-interval');
-  timeIntervalDropdown.addEventListener('change', function() {
-  const selectedValue = timeIntervalDropdown.value;
-  window.location.href = `?time_interval=${selectedValue}`;
-  });
-  </script>
+
   
   <script>
   function filterSales(interval) {
@@ -785,5 +684,86 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   });
   </script>
+
+  <script>
+    // Configuration object for the chart
+    const config = {
+      type: 'bar',
+      data: data,
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Chart.js Bar Chart - Stacked'
+          },
+        },
+        responsive: true,
+        scales: {
+          x: {
+            stacked: true,
+          },
+          y: {
+            stacked: true
+          }
+        }
+      }
+    };
+
+    // Data for the chart
+    const DATA_COUNT = 7;
+    const NUMBER_CFG = {count: DATA_COUNT, min: -100, max: 100};
+    const labels = JSON.parse(`{{ labels|safe }}`);
+    const data = JSON.parse(`{{ data|safe }}`);
+
+    const data = {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Order Amounts',
+          data: Utils.numbers(NUMBER_CFG),
+          backgroundColor: Utils.CHART_COLORS.red,
+        },
+        {
+          label: 'Dataset 2',
+          data: Utils.numbers(NUMBER_CFG),
+          backgroundColor: Utils.CHART_COLORS.blue,
+        },
+        {
+          label: 'Dataset 3',
+          data: Utils.numbers(NUMBER_CFG),
+          backgroundColor: Utils.CHART_COLORS.green,
+        },
+      ]
+    };
+
+    // Actions for interaction
+    const actions = [
+      {
+        name: 'Randomize',
+        handler(chart) {
+          chart.data.datasets.forEach(dataset => {
+            dataset.data = Utils.numbers({count: chart.data.labels.length, min: -100, max: 100});
+          });
+          chart.update();
+        }
+      },
+    ];
+
+    $(document).ready(function() {
+      // Initialize Chart.js chart
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var myChart = new Chart(ctx, config);
+
+      // Add event listener to randomize button
+      $('#randomize-btn').click(function() {
+        // Execute the 'Randomize' action
+        actions[0].handler(myChart);
+      });
+    });
+  </script>
+
+
+
+
 
 </html>

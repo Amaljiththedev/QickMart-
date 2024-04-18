@@ -168,7 +168,7 @@
                     }
                 });
             }
-    
+        
             // Function to update cart totals
             function updateCartTotals() {
                 var subtotal = 0;
@@ -179,21 +179,27 @@
                 var total = subtotal + 50; // Assuming delivery charge is ₹50
                 $('#total').text('₹' + total.toFixed(2));
             }
-    
+        
             // Initial calculation of cart totals when the page loads
             updateCartTotals();
-    
+        
             // Plus button click event
             $('.plus-btn').click(function() {
+                console.log('Plus button clicked');
                 var input = $(this).parent().prev('input.qty-input');
                 var currentVal = parseInt(input.val());
                 var stockCount = parseInt(input.attr('max'));
+                console.log('Current value:', currentVal);
+                console.log('Max stock count:', stockCount);
                 if (!isNaN(currentVal) && currentVal < stockCount) {
                     input.val(currentVal + 1).change();
                     updateCartItem($(this).closest('tr'));
+                    console.log('Quantity increased');
+                } else {
+                    console.log('Reached maximum stock count');
                 }
             });
-    
+        
             // Minus button click event
             $('.minus-btn').click(function() {
                 var input = $(this).parent().next('input.qty-input');
@@ -203,7 +209,7 @@
                     updateCartItem($(this).closest('tr'));
                 }
             });
-    
+        
             // Quantity input change event
             $('.qty-input').change(function() {
                 var input = $(this);
@@ -215,6 +221,9 @@
                 updateCartItem($(this).closest('tr'));
             });
         });
-    </script>
+        
+        
+        </script>
+        
 
 {% endblock content %}
