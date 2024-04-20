@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user_profile', '0002_delete_orders'),
+        ("user_profile", "0002_delete_orders"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='order_quantity',
+            model_name="order",
+            name="order_quantity",
             field=models.PositiveIntegerField(default=1),
             preserve_default=False,
         ),

@@ -152,8 +152,25 @@ p {
                     <div class="col"> <strong>Status:</strong> <br>{{ order.get_status_display }} </div>
                     <div class="col"> <strong>Tracking #:</strong> <br>{{ order.tracking_number }} </div>
                     <div class="col"> <strong>payment:</strong> <br>{{ order.payment_method }} </div>
+                    
                 </div>
             </article>
+            <h1>Download Invoice</h1>
+            <p>Click the button below to download your invoice:</p>
+            <form action="{% url 'user_profile:download_invoice' order.id %}" method="get">
+                {% csrf_token %}
+                <button type="submit" style="background-color: #4CAF50; /* Green */
+                               border: none;
+                               color: white;
+                               padding: 15px 32px;
+                               text-align: center;
+                               text-decoration: none;
+                               display: inline-block;
+                               font-size: 16px;
+                               margin: 4px 2px;
+                               cursor: pointer;
+                               border-radius: 4px;">Download Invoice</button>
+            </form>
             <div class="track">
                 {% for step in tracking_steps %}
                     <div class="step {% if step.active %}active{% endif %}">
@@ -179,6 +196,7 @@ p {
             <hr>
             <a href="{% url 'user_profile:user_orders' %}" class="btn btn-warning" data-abc="true"> <i class="fa fa-chevron-left"></i> Back to orders</a>
         </div>
+
     </article>
 </div>
 

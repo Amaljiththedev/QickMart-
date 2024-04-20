@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user_auth', '0001_initial'),
+        ("user_auth", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customuser',
-            name='wallet_balance',
+            model_name="customuser",
+            name="wallet_balance",
             field=models.DecimalField(decimal_places=2, default=0, max_digits=10),
         ),
     ]

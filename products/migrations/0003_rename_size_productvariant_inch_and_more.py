@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('products', '0002_productvariant_is_active'),
+        ("products", "0002_productvariant_is_active"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='productvariant',
-            old_name='size',
-            new_name='inch',
+            model_name="productvariant",
+            old_name="size",
+            new_name="inch",
         ),
         migrations.AddField(
-            model_name='productvariant',
-            name='internal_storage',
+            model_name="productvariant",
+            name="internal_storage",
             field=models.CharField(blank=True, max_length=50, null=True),
         ),
         migrations.AddField(
-            model_name='productvariant',
-            name='ram',
+            model_name="productvariant",
+            name="ram",
             field=models.CharField(blank=True, max_length=50, null=True),
         ),
     ]

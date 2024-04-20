@@ -8,14 +8,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user_profile', '0014_alter_wishlist_product_alter_wishlist_user'),
+        ("user_profile", "0014_alter_wishlist_product_alter_wishlist_user"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='wishlist',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='customers_wishlist', to=settings.AUTH_USER_MODEL),
+            model_name="wishlist",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="customers_wishlist",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--g4mu^%2wmm@adeoe4ze$6o%!!q7boo*47e1jd0y!dy!o8sds0'
+SECRET_KEY = "django-insecure--g4mu^%2wmm@adeoe4ze$6o%!!q7boo*47e1jd0y!dy!o8sds0"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -34,86 +34,85 @@ ALLOWED_HOSTS = []
 
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'user_auth',
-    'admin_auth',
-    'category',
-    'products',
-    'registration',
-    'banner', 
-    'user_profile',
-    'inventory',
-    'ckeditor',
-    'reset_password',
-    'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'reportlab',
-    
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "user_auth",
+    "admin_auth",
+    "category",
+    "products",
+    "registration",
+    "banner",
+    "user_profile",
+    "inventory",
+    "ckeditor",
+    "reset_password",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "reportlab",
 ]
 
 
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
         ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        }
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
     }
 }
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',   #google middleware
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",  # google middleware
 ]
 
-ROOT_URLCONF = 'Qickmart.urls'
+ROOT_URLCONF = "Qickmart.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": ["templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'Qickmart.wsgi.application'
+WSGI_APPLICATION = "Qickmart.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres', 
-        'USER': 'postgres',
-        'PASSWORD': '7025',
-        'HOST': '127.0.0.1', 
-        'PORT': '5678',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": "7025",
+        "HOST": "127.0.0.1",
+        "PORT": "5678",
     }
 }
 
@@ -123,16 +122,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -140,9 +139,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -155,38 +154,38 @@ USE_TZ = True
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, "static"),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-AUTH_USER_MODEL = 'user_auth.CustomUser'
+AUTH_USER_MODEL = "user_auth.CustomUser"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Media path
 
-MEDIA_URL='/media/'
-MEDIA_ROOT=os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': 'Custom',
-        'toolbar_Custom': [
-            ['Bold', 'Italic', 'Underline', 'Strike'],
-            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
-            ['Link', 'Unlink', 'Anchor'],
-            ['RemoveFormat', 'Source']
+    "default": {
+        "toolbar": "Custom",
+        "toolbar_Custom": [
+            ["Bold", "Italic", "Underline", "Strike"],
+            ["NumberedList", "BulletedList", "-", "Outdent", "Indent"],
+            ["Link", "Unlink", "Anchor"],
+            ["RemoveFormat", "Source"],
         ],
-        'width': '100%',
+        "width": "100%",
     },
 }
 
-RAZORPAY_KEY_ID='rzp_test_mIfQHGI8YglKj3'
-RAZORPAY_SECRET_KEY='qp1DPcg2z5M1IBL0T7AwXGVt'
+RAZORPAY_KEY_ID = "rzp_test_mIfQHGI8YglKj3"
+RAZORPAY_SECRET_KEY = "qp1DPcg2z5M1IBL0T7AwXGVt"
