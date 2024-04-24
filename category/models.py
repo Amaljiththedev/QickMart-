@@ -1,4 +1,6 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 
 # Create your models here.
@@ -7,7 +9,11 @@ class category(models.Model):
     image = models.ImageField(upload_to="category_media", blank=True)
     description = models.TextField(null=False, blank=False)
     category_offer_description = models.TextField(blank=True, null=True)
-    category_offer = models.PositiveBigIntegerField(default=0)
+    category_offer = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

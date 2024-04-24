@@ -120,7 +120,7 @@
                                     {% endfor %}
                                     <tr class="cart-grand-total">
                                         <td colspan="2">Grand Total:</td>
-                                        <td>{{ total }}</td>
+                                        <td>{{ total_amount }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -130,9 +130,14 @@
                         <h3>Payment</h3>
                         <div class="form-group">
                             <label for="payment-method">Select Payment Method:</label>
-                            <select id="payment-method" class="form-control" name="payment_method" onchange="togglePaymentButtons(this.value)">
+                            <select id="payment-method" class="form-control" name="payment_method">
+                                Total: {{ total }} <!-- Debugging output to check the value of total -->
                                 {% for key, value in payment_modes.items %}
-                                    <option value="{{ key }}">{{ value }}</option>
+                                    {% if key == 'Cash on delivery' and total_amount >= 1000 %}
+                                        <option value="{{ key }}" disabled>{{ value }} (Not available for Order above 1000)</option>
+                                    {% else %}
+                                        <option value="{{ key }}">{{ value }}</option>
+                                    {% endif %}
                                 {% endfor %}
                             </select>
                         </div>

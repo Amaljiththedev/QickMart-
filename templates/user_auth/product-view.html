@@ -60,6 +60,19 @@
     flex-wrap: wrap;
     gap: 10px;
 }
+.product-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+.product-image {
+    width: 200px; /* Set maximum width */
+    height: 200px; /* Set maximum height */
+    object-fit: cover; /* Ensure the image covers the entire space */
+    margin: 10px; /* Add margin around images */
+}
 .variant-item {
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -165,12 +178,6 @@
                         </div>
                         <div class="price-box pt-20">
                             <span class="new-price new-price-2">₹{{ product.price }}</span>
-                        </div>
-                        <div class="product-desc">
-                            <p>
-                                <span>{{ product.description|safe }}
-                                </span>
-                            </p>
                         </div>
 
                         

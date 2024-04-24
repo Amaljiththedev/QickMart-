@@ -79,14 +79,6 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
 
-class Wishlist(models.Model):
-    user = models.ForeignKey(
-        CustomUser, related_name="customers_wishlist", on_delete=models.CASCADE
-    )
-    product = models.ForeignKey(
-        Products, related_name="wishlist_products", on_delete=models.CASCADE
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class UserWishlist(models.Model):
@@ -97,3 +89,12 @@ class UserWishlist(models.Model):
         Products, related_name="wishlistproducts", on_delete=models.CASCADE
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class FailedOrder(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    order_id = models.CharField(max_length=100)  # You may need to adjust the field type and length
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Failed order for {self.user.username}"

@@ -123,6 +123,7 @@
                                         </div>
                                         <h4><a class="product_name" href="{% url 'user_auth:user_product_view' product.id%}">{{product.title|truncatewords:10 }}</a></h4>
                                         <div class="price-box">
+                                            <span class="old-price">₹{{ product.actual_price }}</span>
                                             <span class="new-price">₹{{ product.price }}</span>
                                         </div>
                                     </div>

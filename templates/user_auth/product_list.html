@@ -14,6 +14,13 @@
         border-radius: 4px;
         cursor: pointer;
     }
+    .product-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+    }
+
     
     /* Style for Disabled (Out of Stock) button */
     .add-cart.disabled {
@@ -25,6 +32,12 @@
         border-radius: 4px;
         cursor: not-allowed;
         opacity: 0.6; /* Lower opacity */
+    }
+    .product-image {
+        width: 200px; /* Set maximum width */
+        height: 200px; /* Set maximum height */
+        object-fit: cover; /* Ensure the image covers the entire space */
+        margin: 10px; /* Add margin around images */
     }
     
     /* Remove hover effects for disabled button */
@@ -39,11 +52,6 @@
         <div class="row">
             <div class="col-lg-9 order-1 order-lg-2">
                 <!-- Begin Li's Banner Area -->
-                <div class="single-banner shop-page-banner">
-                    <a href="#">
-                        <img src="images/bg-banner/2.jpg" alt="Li's Static Banner">
-                    </a>
-                </div>
                 <!-- Li's Banner Area End Here -->
                 <!-- shop-top-bar start -->
                 <div class="shop-top-bar mt-30">
@@ -171,7 +179,6 @@
                                                     <div class="price-box">
                                                         <span class="new-price">₹{{prod.price}}</span>
                                                     </div>
-                                                    <p>{{prod.description|safe|truncatewords:15}}</p>
                                                 </div>
                                             </div>
                                         </div>

@@ -83,8 +83,18 @@ def dashboard(request):
         top_products = Products.objects.annotate(
             total_orders=Count("orderitem__order")
         ).order_by("-total_orders")[:10]
+
+        top_brands = Brand.objects.annotate(
+            total_orders=Count('brand_name')
+            ).order_by('-total_orders')[:10]
+        
+        top_categories = category.objects.annotate(
+            total_orders=Count('category_name')
+            ).order_by('-total_orders')[:10]
+
+
         monthly_revenue = (
-            Order.objects.filter()
+            Order.objects.filter(paid=True or status=="Delivered")
             .annotate(month=TruncMonth("created_at"))
             .values("month")
             .annotate(total_revenue=Sum("total_price"))
@@ -92,7 +102,7 @@ def dashboard(request):
         filtered_orders = None
         # Yearly Revenue
         yearly_revenue = (
-            Order.objects.filter()
+            Order.objects.filter(paid=True or status=="Delivered")
             .annotate(year=TruncYear("created_at"))
             .values("year")
             .annotate(total_revenue=Sum("total_price"))
@@ -124,7 +134,7 @@ def dashboard(request):
 
         total_amount_received //= 1000
 
-        order_details_last_week = Order.objects.filter(created_at__gte=one_week_ago)
+        order_details_last_week = Order.objects.filter(paid=True,created_at__gte=one_week_ago)
 
         order_details_last_week = order_details_last_week.count()
         # Calculate the total offer price for order details from last week
@@ -138,7 +148,7 @@ def dashboard(request):
         category_labels = [category.name for category in main_categories]
         category_data = [category.num_product_variants for category in main_categories]
 
-        total_products = ProductVariant.objects.count()
+        total_products = Products.objects.count()
 
         time_interval = request.GET.get(
             "time_interval", "all"
@@ -157,13 +167,13 @@ def dashboard(request):
             orders = orders.values("date_truncated").annotate(
                 total_amount=Sum("offer_price")
             )
-
         monthly_sales = (
-            Order.objects.annotate(month=TruncMonth("created_at"))
-            .values("month")
-            .annotate(total_amount=Sum("total_price"))
-            .order_by("month")
-        )
+                Order.objects.filter(paid=True)  # Add your filter condition here
+                .annotate(month=TruncMonth("created_at"))
+                .values("month")
+                .annotate(total_amount=Sum("total_price"))
+                .order_by("month")
+            )
         monthly_labels = [entry["month"].strftime("%B %Y") for entry in monthly_sales]
         monthly_data = [float(entry["total_amount"]) for entry in monthly_sales]
         monthly_data = [float(entry["total_amount"]) for entry in monthly_sales]
@@ -216,6 +226,8 @@ def dashboard(request):
             "category_data": json.dumps(category_data),
             "monthly_labels": json.dumps(monthly_labels),
             "monthly_data": json.dumps(monthly_data),
+            "top_categories":top_categories,
+            "top_brands":top_brands,
         }
 
         if request.method == "GET":

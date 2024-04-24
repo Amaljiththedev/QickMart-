@@ -11,7 +11,7 @@ from registration.views import generate_otp
 from user_auth.models import CustomUser
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Address, Cart, Order, OrderItem, UserWishlist, payment, Wishlist
+from .models import Address, Cart, Order, OrderItem, UserWishlist, payment
 from django.db.models import Q
 from category.models import category as Category
 from django.shortcuts import redirect, get_object_or_404
@@ -189,8 +189,13 @@ def add_to_cart(request):
         product_id = request.POST.get("product_id")
         quantity = request.POST.get("quantity", 1)
 
+
+
         try:
             product = get_object_or_404(Products, id=product_id)
+            wishlist_items = UserWishlist.objects.filter(user=request.user, product=product)
+            wishlist_items.delete()
+
 
             if product.stock_count <= 0:
                 return JsonResponse({"error": "Product is out of stock."}, status=400)
@@ -207,9 +212,6 @@ def add_to_cart(request):
             if not created:
                 cart_item.product_quantity += int(quantity)
                 cart_item.save()
-            print(cart_item.product.price)
-
-            # Update the stock count of the product
 
             return JsonResponse({"success": "Item added to cart successfully."})
         except (ValueError, Products.DoesNotExist):
@@ -359,12 +361,12 @@ def checkout(request):
         total_amount += item.total_price
         print(item.coupon_discount_amount)
         print(f"Product:, Quantity: {item.product_quantity}")
-
+    
     context = {
         "addresses": addresses,
         "cart": cart,
         "payment_modes": payment_modes,
-        "total_amount": total_amount,
+        "total_amount": total_amount+50,
     }
 
     # Render the checkout template with the context
@@ -497,9 +499,7 @@ def wallet_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order_items = order.orderitem_set.all()
     cart = Cart.objects.filter(user=request.user)
-    # Fetch related OrderItem objects
-
-    user_profile = request.user  # Assuming user profile is associated with the user
+    user_profile = request.user
 
     if request.method == "POST":
         wallet_balance = user_profile.wallet_balance
@@ -513,12 +513,18 @@ def wallet_payment(request, order_id):
             user_profile.save()
             order.paid = True
             order.save()
+            cart.delete()  # Remove items from the cart after successful payment
             messages.success(request, "Payment successful. Order placed.")
             return redirect("user_profile:order_confirmation", order_id=order.id)
         else:
-            messages.error(request, "Insufficient funds in wallet.")
+            # Update the paid status of the order to False
+            order.paid = False
+            order.status="Payment pending" 
+            order.save()
+            messages.error(request, "Insufficient funds in wallet. Payment failed.")
             return redirect("user_profile:wallet_payment", order_id=order.id)
-    cart.delete()
+
+    # If the request method is not POST, render the wallet payment page
     context = {
         "order": order,
         "order_items": order_items,
@@ -564,44 +570,28 @@ def remove_from_wishlist(request, id):
     return redirect("user_profile:wishlist")
 
 
-def success(request):
-
-    if request.method == "POST":
-        a = request.POST
-        order_id = ""
-
-        for key, val in a.items():
-            if key == "razor_order_id":
-                order_id = valht
-                break
-
-        user = Order.objects, filter(razorpay_order_id_id=order_id).first()
-        user.paid = True
-        user.save()
-        print("hheellllooooo")
-
-    return render(request, "user_auth/success.html")
-
 
 def razor_payment(request):
     payments = request.GET.get(
         "payments"
-    )  # Get the value of 'payments' query parameter
+    ) 
     order_id = request.GET.get(
         "order_id"
-    )  # Get the value of 'order_id' query parameter
+    ) 
     print(f"hi this is order_id", order_id)
 
     context = {"order_id": order_id}
 
-    # Now you can use the 'payments' and 'order_id' variables as needed
-    # For example, you can pass them to the template context to render them in the HTML template
 
     return render(request, "user_auth/razor_payment.html", context)
 
 
 def order_details(request, order_id):
-    order = Order.objects.get(id=order_id)  # Assuming you have a model named Order
+    order = get_object_or_404(Order, id=order_id)
+
+    if not order.paid and order.payment_method != "Cash on Delivery":
+        # If payment for the order has failed and it's not COD, render a different template
+        return render(request, "user_auth/failed_order.html")
 
     tracking_steps = [
         {"icon": "fa fa-check", "text": "Order confirmed", "active": False},
@@ -634,45 +624,40 @@ def reset_password(request):
 @csrf_exempt
 def razorpay_callback(request):
     if request.method == "POST":
-        # Process the callback data from Razorpay
         data = request.POST
-
-        # Retrieve cart items for the current user
         cart_items = Cart.objects.filter(user=request.user)
-
-        # Calculate total price based on cart items
         total_price = sum(cart_item.product.price for cart_item in cart_items)
-
-        # Create a new order object with the total price
-        with transaction.atomic():
-            order = Order.objects.create(
-                user=request.user,
-                total_price=total_price,
-                payment_method="Razorpay",  # Assuming Razorpay is the payment method
-                paid=True,
-                razorpay_order_id=data.get('razorpay_payment_id'),
-            )
-
-            # Create order items for each cart item
-            for cart_item in cart_items:
-                OrderItem.objects.create(
-                    order=order,
-                    product=cart_item.product,
-                    quantity=cart_item.product_quantity,
-                    price=cart_item.product.price,
-                    # Add other relevant fields
+        try:
+            with transaction.atomic():
+                order = Order.objects.create(
+                    user=request.user,
+                    total_price=total_price,
+                    payment_method="Razorpay",
+                    paid=True,  # Assume payment is successful initially
+                    razorpay_order_id=data.get('razorpay_payment_id'),
                 )
-
-        # Clear the cart after creating the order
-        cart_items.delete()
-
-        # Return a JSON response indicating successful processing of the callback
-        return render(
-            request,
-            "user_auth/success.html",
-        )
+                for cart_item in cart_items:
+                    OrderItem.objects.create(
+                        order=order,
+                        product=cart_item.product,
+                        quantity=cart_item.product_quantity,
+                        price=cart_item.product.price,
+                    )
+            cart_items.delete()
+            return render(
+                request,
+                "user_auth/success.html",
+            )
+        except Exception as e:
+            # If any exception occurs (indicating payment failure), handle it here
+            if order:
+                order.paid = False 
+                order.status="Payment pending" # Update the paid status to False
+                order.save()
+            return JsonResponse(
+                {"status": "error", "message": str(e)}, status=500
+            )
     else:
-        # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse(
             {"status": "error", "message": "Only POST method is allowed"}, status=405
         )
@@ -681,23 +666,31 @@ def download_invoice(request, order_id):
     order = Order.objects.get(id=order_id)
     template_path = 'user_auth/pdf.html'
     context = {'order': order}
-    # Create a Django response object, and specify content_type as pdf
     response = HttpResponse(content_type='application/pdf')
-
-    # If download:
     response['Content-Disposition'] = 'attachment; filename="report.pdf"'
-
-    #If need to view the invoice:
-    # response['Content-Disposition'] = 'filename="report.pdf"'
-    # find the template and render it.
     template = get_template(template_path)
     html = template.render(context)
 
-    # create a pdf
     pisa_status = pisa.CreatePDF(
        html, dest=response)
-    # if error then show some funny view
     if pisa_status.err:
        return HttpResponse('We had some errors <pre>' + html + '</pre>')
 
     return response
+
+def retry_payment(request):
+    # Check if the user is authenticated
+    if not request.user.is_authenticated:
+        return redirect('login')  # Redirect to login page if not authenticated
+    
+    # Retrieve the failed order associated with the current user
+    failed_order = FailedOrder.objects.filter(user=request.user).first()
+    
+    if not failed_order:
+        # If no failed order found, redirect to some appropriate page
+        return redirect('some_page')  # Redirect to a relevant page
+        
+    # Now, you can implement your retry logic here
+    
+    # For example, you might want to redirect the user to the checkout page
+    return redirect('checkout')

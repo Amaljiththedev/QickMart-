@@ -1,0 +1,16 @@
+{% extends 'user_auth/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Failed Order</h4>
+            <p class="card-text">Unfortunately, the payment for this order has failed. Please click the button below to retry the payment.</p>
+            {% comment %} <a href="{% url 'user_profile:retry_payment' order.id %}" class="btn btn-primary">Retry Payment</a> {% endcomment %}
+            <a href="{% url 'user_profile:user_orders' %}" class="btn btn-secondary">Back to Orders</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

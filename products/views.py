@@ -5,6 +5,9 @@ from category.models import category as Category  # Import the Category model
 from category.models import Brand as Brand
 from admin_auth import views
 from user_profile.models import Order
+from decimal import Decimal
+
+
 
 
 # Create your views here.
@@ -33,15 +36,14 @@ def add_product(request):
             title = request.POST.get("title")
             category_id = request.POST.get("category")
             description = request.POST.get("description")
-            price = request.POST.get("price")
+            price = Decimal(request.POST.get("price"))
+            offer_price = Decimal(request.POST.get("offer_price"))
             brand_id = request.POST.get("brand")
             status = request.POST.get("status")
-            stock_count = request.POST.get("stock_count")
+            stock_count = int(request.POST.get("stock_count"))
             image = request.FILES.get("image")
-            weight = request.POST.get("weight")
-            height = request.POST.get(
-                "dimensions"
-            )  # Assuming height corresponds to dimensions
+            weight = Decimal(request.POST.get("weight"))
+            height = Decimal(request.POST.get("dimensions"))  # Assuming height corresponds to dimensions
             trending = request.POST.get("trending") == "on"
             product_details = request.POST.get("product_details")
 
@@ -49,12 +51,20 @@ def add_product(request):
             category = Category.objects.get(id=category_id)
             brand = Brand.objects.get(id=brand_id)
 
+            cat_offer = category.category_offer
+            product_offer = offer_price
+
+            if cat_offer < product_offer:
+                the_offer_price = cat_offer / 100 * price
+            else:
+                the_offer_price = product_offer / 100 * price
+
             # Create Products object
             product = Products.objects.create(
                 title=title,
                 category=category,
                 description=description,
-                price=price,
+                price=price - the_offer_price,
                 brand=brand,
                 status=status,
                 stock_count=stock_count,
@@ -63,7 +73,15 @@ def add_product(request):
                 height=height,
                 trending=trending,
                 product_details=product_details,
+                offer_price=offer_price,
+                actual_price= price # Assign actual_price directly
             )
+
+            print(product.actual_price)
+            print(cat_offer)
+            print(product_offer)
+
+
             if request.FILES.getlist("images"):
                 for img in request.FILES.getlist("images"):
                     ProductImage.objects.create(product=product, image=img)
@@ -74,20 +92,29 @@ def add_product(request):
         return render(request, "admin_auth/product_add.html", context)
     return render(request, "admin_auth/authentication-login.html")
 
+from decimal import Decimal
+from django.shortcuts import render, redirect
+from .models import Products, Category, Brand, ProductImage
 
 def update_product(request, id):
     if "email" in request.session:
+        # Retrieve the product object to be updated
         product = Products.objects.get(id=id)
+
+        # Retrieve choices and data needed for rendering the form
         status_choices = Products.Status_choices
         categories = Category.objects.all()
-        brand = Brand.objects.all()
+        brands = Brand.objects.all()
+
         context = {
-            "brand": brand,
             "categories": categories,
             "status_choices": status_choices,
+            "brands": brands,
             "product": product,
         }
+
         if request.method == "POST":
+            # Retrieve form data
             title = request.POST.get("title")
             cat_id = request.POST.get("category")
             description = request.POST.get("description")
@@ -99,12 +126,22 @@ def update_product(request, id):
             weight = request.POST.get("weight")
             dimensions = request.POST.get("dimensions")
             trending = request.POST.get("trending") == "on"
+            offer_price = request.POST.get("offer_price")
 
+            category = Category.objects.get(id=cat_id)
+
+            cat_offer = Decimal(category.category_offer)
+            product_offer = Decimal(offer_price)
+
+            if cat_offer < product_offer:
+                the_offer_price = cat_offer / Decimal(100) * Decimal(price)
+            else:
+                the_offer_price = product_offer / Decimal(100) * Decimal(price)
             # Update product fields
             product.title = title
             product.category = Category.objects.get(id=cat_id)
             product.description = description
-            product.price = price
+            product.price = Decimal(price) - the_offer_price
             product.brand = Brand.objects.get(id=brand_id)
             product.stock_count = stock_count
             product.status = status
@@ -112,24 +149,31 @@ def update_product(request, id):
             product.height = dimensions
             product.trending = trending
             product.product_details = product_details
+            product.offer_price = offer_price
+            product.actual_price = price
 
-            # Handle existing additional images
-            existing_images = product.additional_images.all()
+            print(product.actual_price)
+            print(cat_offer)
+            print(product_offer)
 
-            # Handle uploaded additional images
-            new_images = request.FILES.getlist("images")
-
-            # Save product
+            # Save the updated product
             product.save()
 
-            # Save newly uploaded additional images
+            # Handle newly uploaded additional images
+            new_images = request.FILES.getlist("images")
             for image in new_images:
                 ProductImage.objects.create(product=product, image=image)
 
+            # Redirect to the product management page after successful update
             return redirect("product_management")
 
+        # Render the product update form with the context data
         return render(request, "admin_auth/product_update.html", context)
+
+
+    # If user is not logged in, redirect to the login page
     return render(request, "admin_auth/authentication-login.html")
+
 
 
 def block_product(request, id):

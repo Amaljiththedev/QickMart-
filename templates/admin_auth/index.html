@@ -353,7 +353,7 @@
   <canvas id="donut" width="300" height="300"></canvas>
 </div>
 <div class="container-fluid">
-  <!--  Row 1 -->
+  <!-- Row 1 -->
   <div class="row">
     <div class="col-lg-4 d-flex align-items-stretch">
         <div class="card w-100">
@@ -373,8 +373,8 @@
                         <tbody>
                             {% for product in top_products %}
                             <tr>
-                                <td>{{ product.total_orders }}</td>
-                                <td>{{ product.title }}</td>
+                                <td>{{ product.total_orders}}</td>
+                                <td>{{ product.title|truncatewords:5 }}</td>
                                 <td>{{ product.brand }}</td>
                             </tr>
                             {% endfor %}
@@ -383,29 +383,25 @@
                 </div>
             </div>
         </div>
-        
     </div>
+    
     <div class="col-lg-4 d-flex align-items-stretch">
       <div class="card w-100">
           <div class="card-body p-4">
               <div class="mb-4">
-                  <h5 class="card-title fw-semibold">Top Products</h5>
+                  <h5 class="card-title fw-semibold">Top Brands</h5>
               </div>
               <div class="table-responsive">
                   <table class="table table-striped">
                       <thead>
                           <tr>
-                              <th>Orders Count</th>
-                              <th>Product Name</th>
-                              <th>Product Manufacturer</th>
+                              <th>Brand Name</th>
                           </tr>
                       </thead>
                       <tbody>
-                          {% for product in top_products %}
+                          {% for brand in top_brands %}
                           <tr>
-                              <td>{{ product.total_orders }}</td>
-                              <td>{{ product.title }}</td>
-                              <td>{{ product.brand }}</td>
+                              <td>{{ brand.brand_name }}</td>
                           </tr>
                           {% endfor %}
                       </tbody>
@@ -413,29 +409,25 @@
               </div>
           </div>
       </div>
-      
   </div>
+  
   <div class="col-lg-4 d-flex align-items-stretch">
     <div class="card w-100">
         <div class="card-body p-4">
             <div class="mb-4">
-                <h5 class="card-title fw-semibold">Top Products</h5>
+                <h5 class="card-title fw-semibold">Top Categories</h5>
             </div>
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Orders Count</th>
-                            <th>Product Name</th>
-                            <th>Product Manufacturer</th>
+                            <th>Category Name</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for product in top_products %}
+                        {% for category in top_categories %}
                         <tr>
-                            <td>{{ product.total_orders }}</td>
-                            <td>{{ product.title }}</td>
-                            <td>{{ product.brand }}</td>
+                            <td>{{ category.name }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -443,6 +435,10 @@
             </div>
         </div>
     </div>
+</div>
+</div>
+</div>
+
     
 </div>
   <div class="row">

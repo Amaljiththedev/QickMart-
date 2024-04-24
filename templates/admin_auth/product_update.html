@@ -136,11 +136,14 @@
                                             <label for="price">Price:</label><br>
                                             <input type="number" id="price" name="price" required value="{{ product.price }}"><br><br>
 
+                                            <label for="price">Offer Price:</label><br>
+                                            <input type="number" id="offer_price" name="offer_price" value="{{ product.offer_price }}" required><br><br>
+                                            
                                             <label for="brand">Brand:</label><br>
                                             <select id="brand" name="brand" required>
-                                              {% for choice in brand %}
-                                              <option value="{{ choice.id }}" {% if choice.id == product.brand.id %} selected {% endif %}>{{ choice.brand_name }}</option>
-                                              {% endfor %}
+                                                {% for brand in brands %}
+                                                <option value="{{ brand.id }}">{{ brand.brand_name }}</option>
+                                                {% endfor %}
                                             </select><br><br>
 
                                             <label for="status">Status:</label><br>

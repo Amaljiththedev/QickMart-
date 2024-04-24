@@ -17,7 +17,6 @@ urlpatterns = [
         "delete_address/<int:address_id>/", views.delete_address, name="delete_address"
     ),
     path("orders_page/", views.order_page, name="orders_page"),
-    # path('add-to-wishlist/', views.add_to_wishlist, name='add_to_wishlist'),
     path("add_to_cart/", views.add_to_cart, name="add_to_cart"),
     path(
         "update_cart_quantity/", views.update_cart_quantity, name="update_cart_quantity"
@@ -40,7 +39,6 @@ urlpatterns = [
         views.remove_from_wishlist,
         name="remove_from_wishlist",
     ),
-    path("success/", views.success, name="success"),
     path("razor_pay/", views.razor_payment, name="razor_payment"),
     path("change_password/", views.reset_password, name="reset_passwords"),
     path("razorpay/callback/", views.razorpay_callback, name="razorpay_callback"),

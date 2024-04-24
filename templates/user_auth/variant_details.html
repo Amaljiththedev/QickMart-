@@ -155,9 +155,6 @@
                         </div>
                         <!-- Product description -->
                         <div class="product-desc">
-                            <p>
-                                <span>{{ variant.product.description|safe }}</span>
-                            </p>
                         </div>
                         <!-- Additional product info -->
                         <div class="product-additional-info pt-25">
@@ -251,7 +248,7 @@
         <div class="tab-content">
             <div id="description" class="tab-pane active show" role="tabpanel">
                 <div class="product-description">
-                    <span>{{ product.description|safe }}</span>
+                    <span>{{ variant.product.description|safe }}</span>
                 </div>
             </div>
             <div id="product-details" class="tab-pane" role="tabpanel">
@@ -260,7 +257,7 @@
                         <img src="images/product-details/1.jpg" alt="Product Manufacturer Image">
                     </a>
                     <span style="display: -webkit-box; -webkit-line-clamp: 15; -webkit-box-orient: vertical; overflow: hidden;">
-                        {{ product.product_details|safe }}
+                        <span>{{ variant.product.product_details|safe }}</span>
                     </span>
                     
                 </div>
