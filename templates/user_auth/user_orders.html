@@ -9,8 +9,8 @@
 <style>
     /* Custom styles */
     .img-thumbnail {
-        max-width: 100px;
-        max-height: 100px;
+        max-width: 80px;
+        max-height: 80px;
     }
     .table th,
     .table td {
@@ -19,16 +19,26 @@
     .cancel-btn {
         margin-top: 5px;
     }
+    .page-title {
+        margin-bottom: 20px;
+    }
+    .lead {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+    .track_order-btn {
+        margin-top: 5px;
+    }
 </style>
 
 {% block content %}
     <div class="content">
         <div class="row">
-            <div class="col-sm-4 col-3">
-                <h4 class="page-title">Order List</h4>
+            <div class="col-sm-12">
+                <h2 class="page-title">Order List</h2>
+                <p class="lead">All product orders are listed here. You can manage your orders from this page.</p>
             </div>
         </div>
-        <p class="lead">All product orders are listed here. You can manage your orders from this page.</p>
         <div class="row">
             <div class="col-md-12">
                 <div class="table-responsive">
@@ -48,7 +58,7 @@
                             {% for order in orders %}
                                 <tr>
                                     <td class="text-center">{{ order.created_at }}</td>
-                                    <td style="width: 150px; height: 100px;" class="text-center">
+                                    <td style="width: 100px; height: 80px;" class="text-center">
                                         {% for order_item in order.orderitem_set.all %}
                                             {% if order_item.product.image %}
                                                 <img src="{{ order_item.product.image.url }}" alt="Product Image" class="img-thumbnail">
@@ -59,7 +69,7 @@
                                     </td>   
                                     <td class="text-center">
                                         {% for order_item in order.orderitem_set.all %}
-                                            {{ order_item.product.brand }},{{ order_item.product.title|truncatewords:2 }}{% if not forloop.last %}, {% endif %}
+                                            {{ order_item.product.brand }}, {{ order_item.product.title|truncatewords:2 }}{% if not forloop.last %}, {% endif %}
                                         {% endfor %}
                                     </td>
                                     <td class="text-center">₹{{ order.total_price }}</td>
@@ -73,15 +83,9 @@
                                     {% elif order.status == 'Out of delivery' %}
                                         <a href="{% url 'user_profile:track_order' %}" class="btn btn-info track_order-btn" hidden>Track Order</a>
                                     {% elif order.status == 'Cancelled' and order.paid %}
-                                        <button type="button" class="btn btn-info cancel-btn" data-order-id="{{ order.id }}">Refund Status</button>
                                     {% elif order.status == 'Shipped' %}
                                         <a href="{% url 'user_profile:track_order'  %}" class="btn btn-info track_order-btn" hidden>Track Order</a>
                                     {% endif %}
-                                    
-                                    
-                                    
-                                    
-                                    
                                     </td>
                                 </tr>
                             {% endfor %}

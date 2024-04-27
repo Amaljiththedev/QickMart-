@@ -270,7 +270,6 @@ def dashboard(request):
                 labels = [str(order.id) for order in filtered_orders]
 
                 recent_orders = Order.objects.order_by("-id")[:5]
-            print(type(filtered_customers))
             # Update the context with filtered data
             context.update(
                 {
@@ -473,5 +472,4 @@ def report_pdf_order(request):
         orders = Order.objects.filter(
             created_at__date__range=[from_date, to_date]
         ).order_by("-id")
-        print("yyyyyyyyy", orders)
         return report_generator(request, orders)

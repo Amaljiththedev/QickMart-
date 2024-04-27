@@ -30,7 +30,6 @@ def send_otp_email(receiver_email, otp):
             server.sendmail(sender_email, receiver_email, message.as_string())
         return True
     except Exception as e:
-        print("Failed to send OTP email:", e)
         return False
 
 
@@ -51,9 +50,6 @@ def forgot_password(request):
                         server.starttls()
                         server.login(sender_email, password_email)
                         server.sendmail(sender_email, receiver_email, message)
-                        print("hi")
-                        print(email)
-                        print(otp)
                         request.session["email"] = email
                         request.session["otp"] = otp
                         return redirect("verify_otp")
@@ -83,9 +79,7 @@ def verify_otp(request):
         otp5 = request.POST["otp5"]
         otp6 = request.POST["otp6"]
         OTP = str(otp1) + str(otp2) + str(otp3) + str(otp4) + str(otp5) + str(otp6)
-        print(OTP)
         stored_otp = request.session.get("otp")
-        print(stored_otp)
         if OTP == stored_otp:
             return redirect("change_password")
         else:
@@ -94,13 +88,11 @@ def verify_otp(request):
 
 
 def change_password(request):
-    print("hiiiiiiiiii2222222200000000000000")
     if request.method == "POST":
         new_password = request.POST.get("new_password")
         confirm_password = request.POST.get("confirm_password")
         if new_password == confirm_password:
             email = request.session.get("email")
-            print(email)
             user = CustomUser.objects.filter(email=email).first()
             if user:
                 user.set_password(new_password)

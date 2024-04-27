@@ -19,7 +19,6 @@ def base(request):
 
 
 def home(request):
-    print("This is printing from home page")
     Category = category.objects.filter(is_active=True)[:5]
     products = Products.objects.filter(is_active=True, status="In Stock")
     brand = Brand.objects.all()

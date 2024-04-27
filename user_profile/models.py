@@ -91,10 +91,3 @@ class UserWishlist(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class FailedOrder(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    order_id = models.CharField(max_length=100)  # You may need to adjust the field type and length
-    timestamp = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"Failed order for {self.user.username}"

@@ -20,7 +20,6 @@ def register(request):
         password2 = request.POST.get("password2")
         phone = request.POST.get("phone")
 
-        print(username, email, phone, email)
 
         # Regex patterns for validation
         pattern = r"^[a-zA-Z0-9].*"
@@ -88,12 +87,10 @@ def register(request):
             first_name=first_name,
             last_name=last_name,
         )
-        print()
         user.save()
 
         request.session["email"] = email
         request.session["otp"] = message
-        print(message)
         messages.success(request, "OTP is sent to your email")
         return redirect("otp")
 

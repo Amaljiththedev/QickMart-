@@ -42,6 +42,9 @@ client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRE
 # Create your views here.
 @login_required
 def account_page(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     if request.user.is_authenticated:
         custom_user = request.user
         context = {
@@ -54,6 +57,9 @@ def account_page(request):
 
 @login_required
 def manage_profile(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     custom_user = request.user
 
     if request.method == "POST":
@@ -109,7 +115,7 @@ def verify_otp(request):
 
     return render(request, "registration/verify.html", context)
 
-
+@login_required
 def manage_address(request):
     user = request.user
     addresses = Address.objects.filter(username=user)
@@ -139,7 +145,7 @@ def manage_address(request):
     }
     return render(request, "user_auth/manage_address.html", context)
 
-
+@login_required
 def address_edit(request, address_id):
     # Retrieve the existing address object
     address = get_object_or_404(Address, id=address_id)
@@ -164,7 +170,7 @@ def address_edit(request, address_id):
     }
     return render(request, "user_auth/edit_address.html", context)
 
-
+@login_required
 def view_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
     # Pass the address object to the template for viewing
@@ -173,18 +179,21 @@ def view_address(request, address_id):
     }
     return render(request, "user_auth/view_address.html", context)
 
-
+@login_required
 def delete_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
     address.delete()
     return redirect("user_profile:manage_address")
 
-
+@login_required
 def order_page(request):
     return render(request, "user_auth/orders.html")
 
-
+@login_required
 def add_to_cart(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     if request.user.is_authenticated:
         product_id = request.POST.get("product_id")
         quantity = request.POST.get("quantity", 1)
@@ -223,14 +232,15 @@ def add_to_cart(request):
     else:
         return JsonResponse({"error": "User is not authenticated."}, status=403)
 
-
+@login_required
 def update_cart_quantity(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     try:
-        print("Received AJAX request to update cart quantity")
         if request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest":
             product_id = request.POST.get("product_id")
             new_quantity = int(request.POST.get("quantity"))
-            print("THIS IS NEW QUANTITY", new_quantity)
 
             # Retrieve the product object
             product = get_object_or_404(Products, id=product_id)
@@ -239,9 +249,6 @@ def update_cart_quantity(request):
             cart_item, created = Cart.objects.get_or_create(
                 user=request.user, product=product
             )
-
-            if created:
-                print("New cart item created")
 
             # Update the cart item quantity
             cart_item.product_quantity = new_quantity
@@ -263,11 +270,13 @@ def update_cart_quantity(request):
     except ValueError:
         return JsonResponse({"error": "Invalid quantity value"}, status=400)
     except Exception as e:
-        print("Error:", e)
         return JsonResponse({"error": "Internal server error."}, status=500)
 
-
+@login_required
 def show_cart(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     # Retrieve the current user's cart items
     cart_items = Cart.objects.filter(user=request.user)
     total_price = sum(item.product.price * item.product_quantity for item in cart_items)
@@ -284,21 +293,12 @@ def show_cart(request):
         coupon_code = request.POST.get("coupon_code")
         try:
             coupon = Coupon.objects.get(code=coupon_code)
-            print(
-                "Coupon information:",
-                coupon.code,
-                coupon.discount_type,
-                coupon.discount_value,
-            )  # Debug coupon information
             if coupon.discount_type == "percentage":
                 Coupon_discount = (total_price * coupon.discount_value) / 100
-                print(Coupon_discount)
             elif coupon.discount_type == "fixed_amount":
                 Coupon_discount = coupon.discount_value
-                print(total_price)
         except Coupon.DoesNotExist:
-            print("Coupon not found")
-            pass  # Handle invalid coupon code here
+            messages.error(request, "Invalid coupon code. Please enter a valid coupon code.")
 
         for item in cart_items:
             item.coupon_discount_amount = Coupon_discount
@@ -310,7 +310,6 @@ def show_cart(request):
         )
         item.save()
 
-    print(total_price)
 
     # Pass the cart items, total price, and coupon code to the template as context
     context = {
@@ -323,8 +322,11 @@ def show_cart(request):
     # Pass the cart items to the template
     return render(request, "user_auth/cart.html", context)
 
-
+@login_required
 def cart_items_count(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user).count()
         return JsonResponse({"cart_items_count": cart_items})
@@ -341,8 +343,11 @@ def remove_cart(request, id):
     cart_item.delete()
     return redirect("user_profile:show_cart")
 
-
+@login_required
 def checkout(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     # Retrieve saved addresses from the Address model
     user = request.user
     addresses = Address.objects.filter(username=user)
@@ -359,8 +364,6 @@ def checkout(request):
             item.product.price * item.product_quantity - item.coupon_discount_amount
         )
         total_amount += item.total_price
-        print(item.coupon_discount_amount)
-        print(f"Product:, Quantity: {item.product_quantity}")
     
     context = {
         "addresses": addresses,
@@ -372,8 +375,11 @@ def checkout(request):
     # Render the checkout template with the context
     return render(request, "user_auth/checkoutpage.html", context)
 
-
+@login_required
 def confirm_orders(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     if request.method == "POST":
         # Process form submission
         user = request.user
@@ -384,7 +390,6 @@ def confirm_orders(request):
             item.product.price * item.product_quantity - item.coupon_discount_amount
             for item in cart
         )
-        print(total_price)
         payments = request.POST.get("payments")
         order_id = request.POST.get("order_id")
 
@@ -392,8 +397,8 @@ def confirm_orders(request):
             product = item.product
             quantity = item.product_quantity
 
-            # Update stock count
             product.stock_count -= quantity
+            # Update stock count
             product.save()
 
         if not payment_method:
@@ -441,8 +446,11 @@ def confirm_orders(request):
         }
         return render(request, "user_auth/confirm_orders.html", context)
 
-
+@login_required
 def order_confirmation(request, order_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     order = get_object_or_404(Order, id=order_id)
     order_items = order.orderitem_set.all()
     cart = Cart.objects.filter(user=request.user)  # Fetch related OrderItem objects
@@ -453,7 +461,7 @@ def order_confirmation(request, order_id):
     }
     return render(request, "user_auth/orderconfirmed.html", context)
 
-
+@login_required
 def user_orders(request):
     # Fetch orders related to the current user
     user_orders = Order.objects.filter(user=request.user)
@@ -463,8 +471,11 @@ def user_orders(request):
     }
     return render(request, "user_auth/user_orders.html", context)
 
-
+@login_required
 def cancel_order(request, order_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     order = get_object_or_404(Order, id=order_id)
 
     if order.status != "Shipped":
@@ -483,8 +494,11 @@ def cancel_order(request, order_id):
         # Handle error or redirect to appropriate page
         return redirect("some_error_page")
 
-
+@login_required
 def track_order(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
     # Retrieve orders for the logged-in user
     user = request.user  # Assuming you're using Django's built-in authentication system
     orders = Order.objects.filter(user=user)
@@ -495,36 +509,45 @@ def track_order(request):
     return render(request, "user_auth/track_order.html", context)
 
 
+@login_required
 def wallet_payment(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to access wallet payment.")
+        return redirect("login")
+    order = get_object_or_404(Order, id=order_id, user=request.user)
     order_items = order.orderitem_set.all()
-    cart = Cart.objects.filter(user=request.user)
     user_profile = request.user
+    cart = Cart.objects.filter(user=user_profile)
 
     if request.method == "POST":
         wallet_balance = user_profile.wallet_balance
         total_price = order.total_price
 
-        for x in cart:
-            total_price -= x.coupon_discount_amount
+        for item in cart:
+            product = item.product
+            quantity = item.product_quantity
 
-        if wallet_balance >= total_price and wallet_balance > 0:
-            user_profile.wallet_balance -= total_price
-            user_profile.save()
-            order.paid = True
-            order.save()
-            cart.delete()  # Remove items from the cart after successful payment
-            messages.success(request, "Payment successful. Order placed.")
-            return redirect("user_profile:order_confirmation", order_id=order.id)
+            product.stock_count -= quantity
+            # Update stock count
+            product.save()
+
+
+        if wallet_balance >= total_price > 0:
+            with transaction.atomic():
+                user_profile.wallet_balance -= total_price
+                user_profile.save()
+                order.paid = True
+                order.save()
+                Cart.objects.filter(user=request.user).delete()
+                messages.success(request, "Payment successful. Order placed.")
+                return redirect("user_profile:order_confirmation", order_id=order.id)
         else:
-            # Update the paid status of the order to False
             order.paid = False
-            order.status="Payment pending" 
+            order.status = "Payment pending" 
             order.save()
             messages.error(request, "Insufficient funds in wallet. Payment failed.")
             return redirect("user_profile:wallet_payment", order_id=order.id)
 
-    # If the request method is not POST, render the wallet payment page
     context = {
         "order": order,
         "order_items": order_items,
@@ -533,13 +556,16 @@ def wallet_payment(request, order_id):
     return render(request, "user_auth/wallet_payment.html", context)
 
 
+
+
+@login_required
 def wishlist(request):
     wishlist_items = UserWishlist.objects.filter(user=request.user)
 
     context = {"wishlist_items": wishlist_items}
     return render(request, "user_auth/wishlist.html", context)
 
-
+@login_required
 def user_add_to_wishlist(request):
     if request.method == "POST" and request.user.is_authenticated:
         product_id = request.POST.get("product_id")
@@ -562,7 +588,7 @@ def user_add_to_wishlist(request):
         status=403,
     )
 
-
+@login_required
 def remove_from_wishlist(request, id):
     item = get_object_or_404(UserWishlist, id=id)
 
@@ -570,7 +596,7 @@ def remove_from_wishlist(request, id):
     return redirect("user_profile:wishlist")
 
 
-
+@login_required
 def razor_payment(request):
     payments = request.GET.get(
         "payments"
@@ -578,14 +604,14 @@ def razor_payment(request):
     order_id = request.GET.get(
         "order_id"
     ) 
-    print(f"hi this is order_id", order_id)
+
 
     context = {"order_id": order_id}
 
 
     return render(request, "user_auth/razor_payment.html", context)
 
-
+@login_required
 def order_details(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
@@ -614,14 +640,17 @@ def order_details(request, order_id):
     context = {"order": order, "tracking_steps": tracking_steps}
     return render(request, "user_auth/track_order.html", context)
 
-
+@login_required
 def reset_password(request):
     if request.user.is_authenticated:
         logout(request)
         return redirect("forget_password")
-
+    else:
+        messages.info(request, 'Please log in to access this page.')
+        return render(request, "user_auth/reset_password.html")
 
 @csrf_exempt
+@login_required
 def razorpay_callback(request):
     if request.method == "POST":
         data = request.POST
@@ -643,16 +672,22 @@ def razorpay_callback(request):
                         quantity=cart_item.product_quantity,
                         price=cart_item.product.price,
                     )
+            for item in cart_items:
+                product = item.product
+                quantity = item.product_quantity
+                product.stock_count -= quantity
+                
+            # Update stock count
+                product.save()
             cart_items.delete()
             return render(
                 request,
                 "user_auth/success.html",
             )
         except Exception as e:
-            # If any exception occurs (indicating payment failure), handle it here
             if order:
                 order.paid = False 
-                order.status="Payment pending" # Update the paid status to False
+                order.status="Payment pending"
                 order.save()
             return JsonResponse(
                 {"status": "error", "message": str(e)}, status=500
@@ -661,7 +696,7 @@ def razorpay_callback(request):
         return JsonResponse(
             {"status": "error", "message": "Only POST method is allowed"}, status=405
         )
-
+@login_required
 def download_invoice(request, order_id):
     order = Order.objects.get(id=order_id)
     template_path = 'user_auth/pdf.html'
@@ -678,19 +713,3 @@ def download_invoice(request, order_id):
 
     return response
 
-def retry_payment(request):
-    # Check if the user is authenticated
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to login page if not authenticated
-    
-    # Retrieve the failed order associated with the current user
-    failed_order = FailedOrder.objects.filter(user=request.user).first()
-    
-    if not failed_order:
-        # If no failed order found, redirect to some appropriate page
-        return redirect('some_page')  # Redirect to a relevant page
-        
-    # Now, you can implement your retry logic here
-    
-    # For example, you might want to redirect the user to the checkout page
-    return redirect('checkout')

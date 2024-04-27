@@ -77,9 +77,7 @@ def add_product(request):
                 actual_price= price # Assign actual_price directly
             )
 
-            print(product.actual_price)
-            print(cat_offer)
-            print(product_offer)
+
 
 
             if request.FILES.getlist("images"):
@@ -152,9 +150,6 @@ def update_product(request, id):
             product.offer_price = offer_price
             product.actual_price = price
 
-            print(product.actual_price)
-            print(cat_offer)
-            print(product_offer)
 
             # Save the updated product
             product.save()
