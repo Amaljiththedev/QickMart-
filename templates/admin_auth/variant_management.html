@@ -43,15 +43,13 @@
       <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
-          <!-- Adjusted the brand-logo div and added a missing opening tag for <a> -->
-          <a href="#">
-            <!-- Adjusted the close button div -->
-            <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
-              <i class="ti ti-x fs-8"></i>
-            </div>
+    
           </a>
+          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+            <i class="ti ti-x fs-8"></i>
+          </div>
         </div>
-        <!-- Sidebar navigation -->
+        <!-- Sidebar navigation-->
         <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
           <ul id="sidebarnav">
             <li class="nav-small-cap">
@@ -59,7 +57,7 @@
               <span class="hide-menu">Home</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="./index.html" aria-expanded="false">
+              <a class="sidebar-link" href="{% url 'dashboard' %}" aria-expanded="false">
                 <span>
                   <i class="ti ti-layout-dashboard"></i>
                 </span>
@@ -127,6 +125,14 @@
                 <span class="hide-menu">Variant Management</span>
               </a>
             </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'coupon_management' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-typography"></i>
+                </span>
+                <span class="hide-menu">Coupon Management</span>
+              </a>
+            </li>
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">Logout</span>
@@ -143,7 +149,7 @@
         </nav>
         <!-- End Sidebar navigation -->
       </div>
-      <!-- End Sidebar scroll -->
+      <!-- End Sidebar scroll-->
     </aside>
     <!-- Sidebar End -->
     <!-- Main wrapper -->

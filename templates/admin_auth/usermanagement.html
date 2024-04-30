@@ -18,7 +18,7 @@
       <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
-
+    
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-8"></i>
@@ -32,7 +32,7 @@
               <span class="hide-menu">Home</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="./index.html" aria-expanded="false">
+              <a class="sidebar-link" href="{% url 'dashboard' %}" aria-expanded="false">
                 <span>
                   <i class="ti ti-layout-dashboard"></i>
                 </span>
@@ -98,6 +98,14 @@
                   <i class="ti ti-typography"></i>
                 </span>
                 <span class="hide-menu">Variant Management</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'coupon_management' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-typography"></i>
+                </span>
+                <span class="hide-menu">Coupon Management</span>
               </a>
             </li>
             <li class="nav-small-cap">

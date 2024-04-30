@@ -24,7 +24,6 @@ def home(request):
     brand = Brand.objects.all()
     allban = Banner.objects.all()
 
-    simillar_products = Products.objects.filter(category=Category)
 
     context = {
         "Category": Category,
