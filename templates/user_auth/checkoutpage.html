@@ -87,7 +87,7 @@
                         <h3>Billing Details</h3>
                         <div class="country-select clearfix">
                             <label>Select Saved Address <span class="required">*</span></label>
-                            <select class="nice-select wide" name="saved_address">
+                            <select class="nice-select wide" name="saved_address" id="saved-address-select">
                                 {% for address in addresses %}
                                     <option value="{{ address.id }}">{{ address.house_name }}, {{ address.street }}, {{ address.city }}, {{ address.state }} - {{ address.zipcode }}</option>
                                 {% endfor %}
@@ -203,7 +203,19 @@
         });
     });
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var savedAddressSelect = document.getElementById("saved-address-select");
+        var confirmOrdersButton = document.getElementById("confirm-orders-button");
+        var razorpayButton = document.getElementById("razorpaybtn");
 
+        // Check if no addresses are available
+        if (savedAddressSelect.options.length === 0) {
+            confirmOrdersButton.disabled = true;
+            razorpayButton.disabled = true;
+        }
+    });
+</script>
 
 {% endblock %}
 

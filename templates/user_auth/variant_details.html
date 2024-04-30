@@ -122,6 +122,7 @@
 </style>
 
 
+
 <div class="content-wrapper">
     <div class="container">
         <!-- Product details section -->
@@ -179,7 +180,9 @@
                         <div class="inc qtybutton"><i class="fa fa-angle-up"></i></div>
                     </div>
                 </div>
-                <button class="add-to-cart" type="button" data-product-id="{{ product.id }}">Add to cart</button>
+                <span class="product-details-ref">Reference: {{ variant.id }}</span>
+
+                <button class="add-to-cart" type="button" data-product-id="{{ variant.product.id }}" data-variant-id="{{ variant.id }}">Add to cart</button>
             </form>
         </div>
 
@@ -225,6 +228,7 @@
                         </div>
                     </div>
                 </div>
+
             </div> 
         </div>
     </div>
@@ -471,94 +475,67 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const plusButton = document.querySelector('.inc.qtybutton');
-        const minusButton = document.querySelector('.dec.qtybutton');
-        const quantityInput = document.querySelector('.cart-plus-minus-box');
-
-        plusButton.addEventListener('click', function() {
-            quantityInput.value = parseInt(quantityInput.value) + 1;
-        });
-
-        minusButton.addEventListener('click', function() {
-            if (parseInt(quantityInput.value) > 1) {
-                quantityInput.value = parseInt(quantityInput.value) - 1;
-            }
-        });
-    });
-    function showVariantDetails(variantId) {
-        // Implement logic to show variant details based on variantId
-        console.log("Selected variant:", variantId);
-        // You can redirect to a separate page or use AJAX to load variant details
-    }
     $(document).ready(function() {
-        // Add to cart
-        $('.add-to-cart').on('click', function(e) {
-            e.preventDefault();
-            var productId = $(this).data('product-id'); // Retrieve the product ID from data attribute
-            var quantity = parseInt($(this).parent().find('.cart-plus-minus-box').val());
-            console.log(quantity) // Get the quantity
+        // Function to get CSRF token from cookies
+        function getCSRFToken() {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Check if the cookie name starts with 'csrftoken'
+                    if (cookie.substring(0, 'csrftoken'.length + 1) === ('csrftoken' + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring('csrftoken'.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        $(".add-to-cart").on("click", function() {
+            var productId = $(this).data("product-id");
+            var variantId = $(this).data("variant-id");
+            var quantity = $(".cart-plus-minus-box").val();
+    
+            // Get CSRF token
+            var csrftoken = getCSRFToken();
+    
+            // Check if product ID or variant ID is missing
+            if (!productId || !variantId) {
+                console.error("Error: Product ID or Variant ID is missing.");
+                return;
+            }
+    
+            // AJAX request
             $.ajax({
-                type: 'POST',
-                url: '/user_profile/add_to_cart/',
-                data: {
-                    'product_id': productId,
-                    'quantity': quantity,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}' // Ensure you have csrf_token available
+                url: "{% url 'user_profile:variant_add_to_cart' %}",
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": csrftoken // Include CSRF token in request headers
                 },
+                data: {
+                    product_id: productId,
+                    variant_id: variantId,
+                    quantity: quantity
+                },
+                dataType: "json",
                 success: function(response) {
+                    // Handle successful response
                     if (response.success) {
-                        // Update the cart dynamically here
-                        console.log(response.success); // Log the success message
-                        // Display success message using SweetAlert
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success!',
-                            text: response.success,
-                        });
+                        alert(response.success);
+                        // Optionally, update the cart icon or display a success message
                     } else if (response.error) {
-                        // Display error message using SweetAlert
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: response.error,
-                        });
+                        alert("Error adding variant to cart: " + response.error);
                     }
                 },
-                error: function(xhr, textStatus, error) {
-                    console.log(xhr.statusText);
-                    console.log(textStatus);
-                    console.log(error);
-                    // Handle the error here, such as showing an alert
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'Error adding item to cart. Please try again.',
-                    });
+                error: function(xhr, textStatus, errorThrown) {
+                    console.error("Error:", errorThrown);
+                    alert("An error occurred while adding variant to cart. Please try again.");
                 }
             });
         });
     });
+    
 </script>
-
-
-
-<script>
-    function showVariantDetails(variantId) {
-        $.ajax({
-            type: 'GET',
-            url: `/user_auth/variant-details/${variantId}/`,  // URL with variant_id parameter
-            success: function(response) {
-                // Handle successful response
-                console.log('Variant details:', response);
-                // Update the UI with variant details
-            },
-            error: function(xhr, status, error) {
-                // Handle error response
-                console.error('Error:', error);
-            }
-        });
-    }
-</script>
-
 {%endblock content%}

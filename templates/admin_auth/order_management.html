@@ -1,289 +1,192 @@
-{%load static%}
+{% load static %}
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Modernize Free</title>
-  <link rel="shortcut icon" type="image/png" href="{% static 'assets/admin_auth/images/logos/favicon.png' %}" />
-  <link rel="stylesheet" href="{% static 'assets/admin_auth/css/styles.min.css' %}" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <link rel="stylesheet" href="{% static 'assets/admin_auth/css/styles.min.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'assets/admin_auth/images/logos/favicon.png' %}">
+    <style>
+        /* Custom CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
 
-  <style>
-    /* Custom CSS for stock management */
-    .table th,
-    .table td {
-      vertical-align: middle;
-    }
-  
-    .table th {
-      font-weight: bold;
-    }
-  
-    .table img {
-      max-width: 50px;
-      max-height: 50px;
-      border-radius: 5px;
-    }
-  
-    .btn a {
-      color: white;
-      text-decoration: none;
-    }
-  
-    /* Additional custom styles for spacing */
-    .page-wrapper {
-      padding: 20px;
-    }
-  
-    .card-title {
-      margin-bottom: 20px;
-    }
-  
-    .card-body {
-      padding: 20px;
-    }
-  
-    .table-responsive {
-      margin-top: 20px;
-    }
-  </style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
+
+        .table th {
+            font-weight: bold;
+        }
+
+        .table img {
+            max-width: 50px;
+            max-height: 50px;
+            border-radius: 5px;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .card-title {
+                font-size: 1.3rem;
+            }
+
+            .table img {
+                max-width: 40px;
+                max-height: 40px;
+            }
+
+            .btn {
+                padding: 6px 12px;
+            }
+        }
+    </style>
 </head>
-<body>
-  <!--  Body Wrapper -->
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
-    <aside class="left-sidebar">
-      <!-- Sidebar scroll-->
-      <div>
-        <div class="brand-logo d-flex align-items-center justify-content-between">
 
-          </a>
-          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
-            <i class="ti ti-x fs-8"></i>
-          </div>
-        </div>
-        <!-- Sidebar navigation-->
-        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
-          <ul id="sidebarnav">
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Home</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./index.html" aria-expanded="false">
-                <span>
-                  <i class="ti ti-layout-dashboard"></i>
-                </span>
-                <span class="hide-menu">Dashboard</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Section</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'user_management' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-article"></i>
-                </span>
-                <span class="hide-menu">User management</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'category' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-alert-circle"></i>
-                </span>
-                <span class="hide-menu">Categories</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'product_management' %}" aria-expanded="false">
-                <span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-producthunt" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M10 16v-8h2.5a2.5 2.5 0 1 1 0 5h-2.5" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /></svg>
-                </span>
-                <span class="hide-menu">Product Management</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'banner_management' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-file-description"></i>
-                </span>
-                <span class="hide-menu">Banner Management</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'stock_management' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-typography"></i>
-                </span>
-                <span class="hide-menu">Stock Management</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'order_management' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-typography"></i>
-                </span>
-                <span class="hide-menu">Order Management</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'variant' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-typography"></i>
-                </span>
-                <span class="hide-menu">Variant Management</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Logout</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'logout' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-login"></i>
-                </span>
-                <span class="hide-menu">Logout</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-        <!-- End Sidebar navigation -->
-      </div>
-      <!-- End Sidebar scroll-->
-    </aside>
-    <!--  Sidebar End -->
-    <!--  Main wrapper -->
-    <div class="body-wrapper">
-      <!--  Header Start -->
-      <div class="container-fluid">
-          <div class="card">
-              <div class="card-body">
-                  <h5 class="card-title fw-semibold mb-4">Order Management</h5>
-                  <div class="container-fluid">
-                      <div class="row justify-content-end">
-                      </div>
-                  </div>
-              </div>
-              <div class="card">
-                  <div class="card-body p-4">
-                      <table class="table table-hover">
-                          <thead>
-                              <tr>
-                                  <th>Order ID</th>
-                                  <th>Customer</th>
-                                  <th>Address</th>
-                                  <th>Estimated Delivery Time</th>
-                                  <th>Tracking Number</th>
-                                  <th>Product Name</th>
-                                  <th>Product quantity</th>
-                                  <th>Image</th>
-                                  <th>Status</th>
-                                  <th>Action</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              {% for order in orders %}
-                              <tr>
-                                  <td>{{ order.id }}</td>
-                                  <td>{{ order.user|truncatewords:1 }}</td>
-                                  <td>{{ order.address.street }}, {{ order.address.city }}, {{ order.address.state }}</td>
-                                  <td>{{ order.estimated_delivery_time }}</td>
-                                  <td>{{ order.tracking_number }}</td>
-                                  <td>
-                                      {% for order_item in order.orderitem_set.all %}
-                                      {{ order_item.product.title|truncatewords:2 }}
-                                      {% endfor %}
-                                  </td>
-                                  <td>                                    {% for order_item in order.orderitem_set.all %}
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Order Management</h2>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Address</th>
+                                <th>Estimated Delivery Time</th>
+                                <th>Tracking Number</th>
+                                <th>Product Name</th>
+                                <th>Product Quantity</th>
+                                <th>Image</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.user|truncatewords:1 }}</td>
+                                <td>{{ order.address.street }}, {{ order.address.city }}, {{ order.address.state }}</td>
+                                <td>{{ order.estimated_delivery_time }}</td>
+                                <td>{{ order.tracking_number }}</td>
+                                <td>
+                                    {% for order_item in order.orderitem_set.all %}
+                                    {{ order_item.product.title|truncatewords:2 }}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for order_item in order.orderitem_set.all %}
                                     {{ order_item.quantity }}
-                                    {% endfor %}</td>
-                                  <td>
-                                      {% for order_item in order.orderitem_set.all %}
-                                      {% if order_item.product.image %}
-                                      <img src="{{ order_item.product.image.url }}" alt="{{ order_item.product.title }}" class="product-image">
-                                      {% else %}
-                                      <p>No image available</p>
-                                      {% endif %}
-                                      {% endfor %}
-                                  </td>
-                                  <td>
-                                      <form action="{% url 'update_status' order.id %}" method="post">
-                                          {% csrf_token %}
-                                          <select class="form-control" name="new_status">
-                                              <option value="Pending" {% if order.status == "Pending" %} selected {% endif %}>Pending</option>
-                                              <option value="Processing" {% if order.status == "Processing" %} selected {% endif %}>Processing</option>
-                                              <option value="Shipped" {% if order.status == "Shipped" %} selected {% endif %}>Shipped</option>
-                                              <option value="Delivered" {% if order.status == "Delivered" %} selected {% endif %}>Delivered</option>
-                                              <option value="Out of delivery" {% if order.status == "Out of delivery" %} selected {% endif %}>Out of delivery</option>
-                                              <option value="Cancelled" {% if order.status == "Cancelled" %} selected {% endif %}>Cancelled</option>
-                                              <option value="Return" {% if order.status == "Return" %} selected {% endif %}>Return</option>
-                                              <option value="Refunded" {% if order.status == "Refunded" %} selected {% endif %}>Refunded</option>
-                                          </select>
-                                          <button type="submit" class="btn btn-primary">Update Status</button>
-                                      </form>
-                                      
-                                  </td>
-                                  
-                                  <td>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for order_item in order.orderitem_set.all %}
+                                    {% if order_item.product.image %}
+                                    <img src="{{ order_item.product.image.url }}" alt="{{ order_item.product.title }}" class="product-image">
+                                    {% else %}
+                                    <p>No image available</p>
+                                    {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <form action="{% url 'update_status' order.id %}" method="post">
+                                        {% csrf_token %}
+                                        <select class="form-control" name="new_status" id="newStatusSelect">
+                                            <option value="Pending" {% if order.status == "Pending" %} selected {% endif %}>Pending</option>
+                                            <option value="Processing" {% if order.status == "Processing" %} selected {% endif %}>Processing</option>
+                                            <option value="Shipped" {% if order.status == "Shipped" %} selected {% endif %}>Shipped</option>
+                                            <option value="Delivered" {% if order.status == "Delivered" %} selected {% endif %}>Delivered</option>
+                                            <option value="Out of delivery" {% if order.status == "Out of delivery" %} selected {% endif %}>Out of delivery</option>
+                                            <option value="Cancelled" {% if order.status == "Cancelled" %} selected {% endif %}>Cancelled</option>
+                                            <option value="Return" {% if order.status == "Return" %} selected {% endif %}>Return</option>
+                                            <option value="Refunded" {% if order.status == "Refunded" %} selected {% endif %}>Refunded</option>
+                                        </select>
+                                        {% if order.status != "Cancelled" and order.status != "Return" and order.status != "Refunded" %}
+                                        <button type="submit" class="btn btn-primary">Update Status</button>
+                                        {%endif%}
+                                    </form>
+                                </td>
+                                <td>
                                     {% if order.status == "Return" or order.status == "Cancelled" and order.paid == True %}
-                                        <a href="{% url 'refund_order' order.id %}" class="btn btn-primary">Refund</a>
+                                    <a href="{% url 'refund_order' order.id %}" class="btn btn-primary">Refund</a>
                                     {% elif order.status == "Return" or order.status == "Cancelled" %}
-                                        <a href="{% url 'update_order_details' order.id %}" class="btn btn-primary" hidden>Update Details</a>
-                                    {%else%}
-                                    <a href="{% url 'update_order_details' order.id %}" class="btn btn-primary" >Update Details</a>
+                                    <a href="{% url 'update_order_details' order.id %}" class="btn btn-primary" hidden>Update Details</a>
+                                    {% else %}
+                                    <a href="{% url 'update_order_details' order.id %}" class="btn btn-primary">Update Details</a>
                                     {% endif %}
                                 </td>
-                              </tr>
-                              {% endfor %}
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-  </div>
-  </div>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          var newStatusSelect = document.getElementById('newStatusSelect');
+          var updateStatusBtn = document.getElementById('updateStatusBtn');
   
-</div>
-
-<!-- Scripts -->
-<!-- Include necessary JavaScript files -->
-<script src="{% static 'assets/admin_auth/libs/jquery/dist/jquery.min.js' %}"></script>
-<script src="{% static 'assets/admin_auth/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
-<script>
-  
-    // JavaScript function to update order status
-    function updateStatus(orderId) {
-        var newStatus = $('#statusSelect_' + orderId).val();
-        // Perform AJAX request to update status
-        $.ajax({
-            url: '/update_status/',
-            method: 'POST',
-            data: {
-                order_id: orderId,
-                new_status: newStatus,
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function (response) {
-                // Handle success response
-                console.log(response);
-            },
-            error: function (xhr, errmsg, err) {
-                // Handle error response
-                console.log(xhr.status + ": " + xhr.responseText);
-            }
-        });
-    }
-</script>
+          newStatusSelect.addEventListener('change', function() {
+              var selectedValue = this.value;
+              if (selectedValue === 'Cancelled' || selectedValue === 'Return' || selectedValue === 'Refunded') {
+                  updateStatusBtn.style.display = 'none';
+              } else {
+                  updateStatusBtn.style.display = 'block';
+              }
+          });
+      });
+  </script>
 </body>
 
 </html>

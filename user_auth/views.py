@@ -24,6 +24,8 @@ def home(request):
     brand = Brand.objects.all()
     allban = Banner.objects.all()
 
+    simillar_products = Products.objects.filter(category=Category)
+
     context = {
         "Category": Category,
         "products": products,
@@ -38,11 +40,14 @@ def user_product_view(request, id):
     product = Products.objects.get(id=id)
     product_images = ProductImage.objects.filter(product=product)
     variants = ProductVariant.objects.filter(product=product)
+    product = Products.objects.get(id=id)
+    similar_products = Products.objects.filter(category=product.category).exclude(id=product.id)
 
     context = {
         "product_images": product_images,
         "product": product,
         "variants": variants,
+        'similar_products':similar_products,
     }
 
     return render(request, "user_auth/product-view.html", context)

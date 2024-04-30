@@ -6,7 +6,7 @@ from django.urls import reverse
 from Qickmart import settings
 from category.models import Brand
 from inventory.models import Coupon
-from products.models import Products
+from products.models import ProductVariant, Products, VariantImage
 from registration.views import generate_otp
 from user_auth.models import CustomUser
 from django.contrib.auth.decorators import login_required
@@ -24,6 +24,7 @@ from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.db.models import Max
+from django.views.decorators.csrf import ensure_csrf_cookie
 from io import BytesIO
 from django.template.loader import get_template
 from xhtml2pdf import pisa
@@ -713,3 +714,40 @@ def download_invoice(request, order_id):
 
     return response
 
+
+@login_required
+@ensure_csrf_cookie
+def variant_add_to_cart(request):
+    if request.method == "POST":
+        # Retrieve data from the POST request
+        product_id = request.POST.get("product_id")
+        variant_id = request.POST.get("variant_id")
+        quantity = request.POST.get("quantity", 1)
+
+        # Check if product_id and variant_id are provided
+        if not product_id or not variant_id:
+            return JsonResponse({"error": "Product ID or Variant ID is missing."}, status=400)
+
+        # Retrieve the variant and product objects
+        variant = get_object_or_404(ProductVariant, id=variant_id)
+        product = variant.product
+
+        # Retrieve the variant image
+        variant_image = VariantImage.objects.filter(variant=variant).first()
+
+        # Create or update the cart item
+        cart_item, created = Cart.objects.get_or_create(
+            user=request.user, product=product, variant=variant
+        )
+        # Update product quantity
+        cart_item.product_quantity = int(quantity)
+        # Update price and image of the cart item
+        cart_item.price = variant.price
+        if variant_image:
+            cart_item.image = variant_image.image
+        cart_item.save()
+
+        return JsonResponse({"success": "Variant added to cart successfully."})
+    else:
+        # Return error for non-POST requests
+        return JsonResponse({"error": "Only POST requests are allowed."}, status=405)
