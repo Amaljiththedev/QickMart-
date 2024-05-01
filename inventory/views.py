@@ -6,7 +6,8 @@ from user_profile.models import Order
 from .models import Coupon, Stock
 from products.models import Products
 
-
+# View for Managing Stock
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def stock_management(request):
     if "email" in request.session:
         stock_items = Products.objects.all()
@@ -17,6 +18,8 @@ def stock_management(request):
     return render(request, "admin_auth/authentication-login.html")
 
 
+# View for Updating Stock
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def update_stock(request):
     if request.method == "POST":
         product_id = request.POST.get("product_id")
@@ -51,6 +54,8 @@ def update_stock(request):
     return render(request, "admin_auth/authentication-login.html")
 
 
+# Order Management Views
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def order_management(request):
     if "email" in request.session:
         if request.method == "POST":
@@ -76,8 +81,8 @@ def order_management(request):
                 request, "admin_auth/order_management.html", {"orders": orders}
             )
     return render(request, "admin_auth/authentication-login.html")
-
-
+# View for Updating Order Status
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def update_status(request, order_id):
     if "email" in request.session:
         order = get_object_or_404(Order, id=order_id)
@@ -90,6 +95,8 @@ def update_status(request, order_id):
     return render(request, "admin_auth/authentication-login.html")
 
 
+# View for Updating Order Status
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def update_order_details(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == "POST":
@@ -102,6 +109,9 @@ def update_order_details(request, order_id):
     return render(request, "admin_auth/update_order_details.html", {"order": order})
 
 
+
+# View for Refunding Order
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def refund_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     # Add total price to user's wallet balance
@@ -119,7 +129,8 @@ def refund_order(request, order_id):
         # Redirect to order management page or any other appropriate page
     return redirect("order_management")
 
-
+# Coupon Management Views
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def coupon_list(request):
     coupons = Coupon.objects.all()
 
@@ -127,7 +138,8 @@ def coupon_list(request):
 
     return render(request, "admin_auth/coupon_management.html", context)
 
-
+# View for Adding Coupon
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def add_coupon(request):
     if request.method == "POST":
         code = request.POST.get("code")
@@ -158,6 +170,8 @@ def add_coupon(request):
     return render(request, "admin_auth/add_coupon.html")
 
 
+# View for Deleting Coupon
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def delete_coupon(request, coupon_id):
     coupon = get_object_or_404(Coupon, pk=coupon_id)
     context = {
@@ -167,6 +181,8 @@ def delete_coupon(request, coupon_id):
     return redirect("coupon_management")
 
 
+# View for Deleting Coupon
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def edit_coupon(request, coupon_id):
     coupon = get_object_or_404(Coupon, pk=coupon_id)
     context = {

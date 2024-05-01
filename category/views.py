@@ -7,7 +7,8 @@ from products.models import Products
 
 # Create your views here.
 
-
+# View for Listing Categories
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def category_list(request):
     if "email" in request.session:
         cat = category.objects.all()
@@ -18,6 +19,8 @@ def category_list(request):
     return render(request, "admin_auth/authentication-login.html")
 
 
+# View for Adding Category
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def add_category(request):
 
     if "email" in request.session:
@@ -41,14 +44,16 @@ def add_category(request):
         return render(request, "admin_auth/add_category.html")
     return render(request, "admin_auth/authentication-login.html")
 
-
+# View for Deleting Category
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def delete_category(request, id):
     if "email" in request.session:
         cat = category.objects.get(id=id)
         cat.delete()
         return redirect("category")
 
-
+# View for Editing Category
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def edit_category(request, id):
     if "email" in request.session:
         cat = category.objects.get(id=id)
@@ -75,6 +80,8 @@ def edit_category(request, id):
     return render(request, "admin_auth/authentication-login.html")
 
 
+# View for Blocking Category
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def block_category(request, id):
     if "email" in request.session:
         cat = category.objects.get(id=id)
@@ -83,6 +90,8 @@ def block_category(request, id):
         return redirect("category")
 
 
+# View for Unblocking Category
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def unblock_category(request, id):
     if "email" in request.session:
         cat = category.objects.get(id=id)
@@ -91,8 +100,10 @@ def unblock_category(request, id):
         return redirect("category")
     else:
         return render(request, "admin_auth/authentication-login.html")
+    
 
-
+# View for Adding Brand
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def add_brand(request):
     if "email" in request.session:
         if request.method == "POST":
@@ -105,6 +116,8 @@ def add_brand(request):
         return render(request, "admin_auth/authentication-login.html")
 
 
+# View for Managing Banners
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def banner_management(request):
     if "email" in request.session:
         banner = Banner.objects.all()
@@ -116,7 +129,8 @@ def banner_management(request):
     else:
         return render(request, "admin_auth/authentication-login.html")
 
-
+# View for Adding Banner
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def add_banner(request):
     if "email" in request.session:
         categories = Category.objects.all()
@@ -149,6 +163,8 @@ def add_banner(request):
     return redirect("login_page")
 
 
+# View for Updating Banner
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def update_banner(request, id):
     if "email" in request.session:
         banner = Banner.objects.get(id=id)
@@ -176,6 +192,8 @@ def update_banner(request, id):
     return redirect("login_page")
 
 
+# View for Deleting Banner
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def delete_banner(request, id):
     if "email" in request.session:
         banner = Banner.objects.get(id=id)
@@ -183,6 +201,8 @@ def delete_banner(request, id):
         return redirect("banner_management")
 
 
+# View for Blocking Banner
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def block_banner(request, id):
     if "email" in request.session:
         banner = Banner.objects.get(id=id)
@@ -191,14 +211,18 @@ def block_banner(request, id):
         return redirect("banner_management")
 
 
+# View for Unblocking Banner
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def unblock_banner(request, id):
     if "email" in request.session:
         banner = Banner.objects.get(id=id)
         banner.is_active = False
         banner.save()
         return redirect("banner_management")
+    
 
-
+# View for Listing Inventory
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def inventory(request):
     stock_items = Products.objects.all()
 

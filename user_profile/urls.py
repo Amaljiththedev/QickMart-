@@ -41,7 +41,6 @@ urlpatterns = [
         views.remove_from_wishlist,
         name="remove_from_wishlist",
     ),
-    path("razor_pay/", views.razor_payment, name="razor_payment"),
     path("change_password/", views.reset_password, name="reset_passwords"),
     path("razorpay/callback/", views.razorpay_callback, name="razorpay_callback"),
     path('download_invoice/<int:order_id>', views.download_invoice, name='download_invoice'),

@@ -40,7 +40,8 @@ import razorpay
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
 
 
-# Create your views here.
+# View Function for Account Page
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def account_page(request):
     if not request.user.is_authenticated:
@@ -55,7 +56,8 @@ def account_page(request):
     else:
         return render("user_auth/main.html")
 
-
+# View Function for Managing Profile
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def manage_profile(request):
     if not request.user.is_authenticated:
@@ -79,7 +81,8 @@ def manage_profile(request):
     context = {"custom_user": custom_user}
     return render(request, "user_auth/profile_manage.html", context)
 
-
+# View Function for Verifying OTP
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def verify_otp(request):
     context = {"messages": messages.get_messages(request)}
@@ -116,6 +119,9 @@ def verify_otp(request):
 
     return render(request, "registration/verify.html", context)
 
+
+# View Function for Managing Address
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def manage_address(request):
     user = request.user
@@ -146,6 +152,9 @@ def manage_address(request):
     }
     return render(request, "user_auth/manage_address.html", context)
 
+
+# View Function for Editing Address
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def address_edit(request, address_id):
     # Retrieve the existing address object
@@ -171,6 +180,9 @@ def address_edit(request, address_id):
     }
     return render(request, "user_auth/edit_address.html", context)
 
+
+# View Function for Viewing Address
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def view_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
@@ -180,16 +192,28 @@ def view_address(request, address_id):
     }
     return render(request, "user_auth/view_address.html", context)
 
+
+# View Function for Deleting Address
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def delete_address(request, address_id):
     address = get_object_or_404(Address, id=address_id)
     address.delete()
     return redirect("user_profile:manage_address")
 
+
+
+
+# View Function for Order Page
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def order_page(request):
     return render(request, "user_auth/orders.html")
 
+
+
+# View Function for Adding to Cart
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def add_to_cart(request):
     if not request.user.is_authenticated:
@@ -233,6 +257,9 @@ def add_to_cart(request):
     else:
         return JsonResponse({"error": "User is not authenticated."}, status=403)
 
+
+# View Function for Updating Cart Quantity
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def update_cart_quantity(request):
     if not request.user.is_authenticated:
@@ -273,6 +300,10 @@ def update_cart_quantity(request):
     except Exception as e:
         return JsonResponse({"error": "Internal server error."}, status=500)
 
+
+
+# View Function for Displaying Cart
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def show_cart(request):
     if not request.user.is_authenticated:
@@ -323,6 +354,10 @@ def show_cart(request):
     # Pass the cart items to the template
     return render(request, "user_auth/cart.html", context)
 
+
+# View Function for Removing Item from Cart
+# ---------------------------------------------------------------------------------------------------------------------------
+
 @login_required
 def cart_items_count(request):
     if not request.user.is_authenticated:
@@ -344,6 +379,10 @@ def remove_cart(request, id):
     cart_item.delete()
     return redirect("user_profile:show_cart")
 
+
+
+# View Function for Confirming Orders
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def checkout(request):
     if not request.user.is_authenticated:
@@ -447,6 +486,9 @@ def confirm_orders(request):
         }
         return render(request, "user_auth/confirm_orders.html", context)
 
+
+# View Function for Order Confirmation
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def order_confirmation(request, order_id):
     if not request.user.is_authenticated:
@@ -462,6 +504,9 @@ def order_confirmation(request, order_id):
     }
     return render(request, "user_auth/orderconfirmed.html", context)
 
+
+# View Function for Displaying User Orders
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def user_orders(request):
     # Fetch orders related to the current user
@@ -472,6 +517,10 @@ def user_orders(request):
     }
     return render(request, "user_auth/user_orders.html", context)
 
+
+
+# View Function for Cancelling Order
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def cancel_order(request, order_id):
     if not request.user.is_authenticated:
@@ -495,6 +544,9 @@ def cancel_order(request, order_id):
         # Handle error or redirect to appropriate page
         return redirect("some_error_page")
 
+
+# View Function for Tracking Orders
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def track_order(request):
     if not request.user.is_authenticated:
@@ -509,6 +561,11 @@ def track_order(request):
     }
     return render(request, "user_auth/track_order.html", context)
 
+
+
+
+# View Function for Wallet Payment
+# ---------------------------------------------------------------------------------------------------------------------------
 
 @login_required
 def wallet_payment(request, order_id):
@@ -558,7 +615,8 @@ def wallet_payment(request, order_id):
 
 
 
-
+# View Function for Displaying Wishlist
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def wishlist(request):
     wishlist_items = UserWishlist.objects.filter(user=request.user)
@@ -566,6 +624,9 @@ def wishlist(request):
     context = {"wishlist_items": wishlist_items}
     return render(request, "user_auth/wishlist.html", context)
 
+
+# View Function for Adding Product to Wishlist
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def user_add_to_wishlist(request):
     if request.method == "POST" and request.user.is_authenticated:
@@ -589,6 +650,10 @@ def user_add_to_wishlist(request):
         status=403,
     )
 
+
+
+# View Function for Removing Item from Wishlist
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def remove_from_wishlist(request, id):
     item = get_object_or_404(UserWishlist, id=id)
@@ -597,20 +662,8 @@ def remove_from_wishlist(request, id):
     return redirect("user_profile:wishlist")
 
 
-@login_required
-def razor_payment(request):
-    payments = request.GET.get(
-        "payments"
-    ) 
-    order_id = request.GET.get(
-        "order_id"
-    ) 
-
-
-    context = {"order_id": order_id}
-
-
-    return render(request, "user_auth/razor_payment.html", context)
+# View Function for Order Details
+# ---------------------------------------------------------------------------------------------------------------------------
 
 @login_required
 def order_details(request, order_id):
@@ -641,6 +694,10 @@ def order_details(request, order_id):
     context = {"order": order, "tracking_steps": tracking_steps}
     return render(request, "user_auth/track_order.html", context)
 
+
+
+# View Function for Resetting Password
+# ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def reset_password(request):
     if request.user.is_authenticated:
@@ -649,6 +706,11 @@ def reset_password(request):
     else:
         messages.info(request, 'Please log in to access this page.')
         return render(request, "user_auth/reset_password.html")
+
+
+
+# View Function for Razorpay Callback
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @csrf_exempt
 @login_required
@@ -697,6 +759,11 @@ def razorpay_callback(request):
         return JsonResponse(
             {"status": "error", "message": "Only POST method is allowed"}, status=405
         )
+    
+
+
+# View Function for Downloading Invoice
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------    
 @login_required
 def download_invoice(request, order_id):
     order = Order.objects.get(id=order_id)
@@ -715,33 +782,25 @@ def download_invoice(request, order_id):
     return response
 
 
+
+# View Function for Adding Variant to Cart---------------------------------------------------------------------------------------------------------------------------
 @login_required
 @ensure_csrf_cookie
 def variant_add_to_cart(request):
     if request.method == "POST":
-        # Retrieve data from the POST request
         product_id = request.POST.get("product_id")
         variant_id = request.POST.get("variant_id")
         quantity = request.POST.get("quantity", 1)
-
-        # Check if product_id and variant_id are provided
         if not product_id or not variant_id:
             return JsonResponse({"error": "Product ID or Variant ID is missing."}, status=400)
-
-        # Retrieve the variant and product objects
         variant = get_object_or_404(ProductVariant, id=variant_id)
         product = variant.product
-
-        # Retrieve the variant image
         variant_image = VariantImage.objects.filter(variant=variant).first()
 
-        # Create or update the cart item
         cart_item, created = Cart.objects.get_or_create(
             user=request.user, product=product, variant=variant
         )
-        # Update product quantity
         cart_item.product_quantity = int(quantity)
-        # Update price and image of the cart item
         cart_item.price = variant.price
         if variant_image:
             cart_item.image = variant_image.image
@@ -749,5 +808,4 @@ def variant_add_to_cart(request):
 
         return JsonResponse({"success": "Variant added to cart successfully."})
     else:
-        # Return error for non-POST requests
         return JsonResponse({"error": "Only POST requests are allowed."}, status=405)

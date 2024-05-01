@@ -6,11 +6,12 @@ from category.models import Brand as Brand
 from admin_auth import views
 from user_profile.models import Order
 from decimal import Decimal
+from .models import Products, Category, Brand, ProductImage
 
 
 
-
-# Create your views here.
+# # Product List View
+#--------------------------------------------------------------------------------------------------------------------------------
 def product_view(request):
     if "email" in request.session:
         products = Products.objects.all()
@@ -19,6 +20,9 @@ def product_view(request):
     return render(request, "admin_auth/authentication-login.html")
 
 
+
+# Add Product View
+#--------------------------------------------------------------------------------------------------------------------------------
 def add_product(request):
     if "email" in request.session:
         status_choices = Products.Status_choices  # Use the model's choices
@@ -90,10 +94,9 @@ def add_product(request):
         return render(request, "admin_auth/product_add.html", context)
     return render(request, "admin_auth/authentication-login.html")
 
-from decimal import Decimal
-from django.shortcuts import render, redirect
-from .models import Products, Category, Brand, ProductImage
 
+# Update Product View
+#------------------------------------------------------------------------------------------------------------------------------------------------
 def update_product(request, id):
     if "email" in request.session:
         # Retrieve the product object to be updated
@@ -170,7 +173,8 @@ def update_product(request, id):
     return render(request, "admin_auth/authentication-login.html")
 
 
-
+# Block Product View
+#-------------------------------------------------------------------------------------------------------------------------------------------------
 def block_product(request, id):
     if "email" in request.session:
         product = Products.objects.get(id=id)
@@ -179,7 +183,8 @@ def block_product(request, id):
         return redirect("product_management")
     return render(request, "admin_auth/authentication-login.html")
 
-
+#unblock product
+#------------------------------------------------------------------------------------------------------------------------------------------------------
 def unblock_product(request, id):
     if "email" in request.session:
         product = Products.objects.get(id=id)
@@ -188,7 +193,8 @@ def unblock_product(request, id):
         return redirect("product_management")
     return render(request, "admin_auth/authentication-login.html")
 
-
+#delete product
+#---------------------------------------------------------------------------------------------------------------------------------------------------------
 def delete_product(request, id):
     if "email" in request.session:
         product = Products.objects.get(id=id)
@@ -197,7 +203,8 @@ def delete_product(request, id):
         return redirect("product_management")
     return render(request, "admin_auth/authentication-login.html")
 
-
+#edit variant 
+#--------------------------------------------------------------------------------------------------------------------------------------------------------
 def edit_variant(request, variant_id):
     variant_product = get_object_or_404(ProductVariant, id=variant_id)
 
@@ -221,14 +228,17 @@ def edit_variant(request, variant_id):
             "admin_auth/edit_variant.html",
             {"variant_product": variant_product},
         )
-
-
+# Delete Variant View
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def delete_variant(request, variant_id):
     variant_product = get_object_or_404(ProductVariant, id=variant_id)
     variant_product.delete()
     return redirect("variant")  # Redirect to product detail page
 
 
+
+# block_variant
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def block_variant(request, variant_id):
     variant_product = get_object_or_404(ProductVariant, id=variant_id)
 
@@ -237,6 +247,8 @@ def block_variant(request, variant_id):
     return redirect("variant")  # Redirect to product detail page
 
 
+#unblock variant
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def unblock_variant(request, variant_id):
     variant_product = get_object_or_404(ProductVariant, id=variant_id)
     variant_product.is_active = True
@@ -244,6 +256,9 @@ def unblock_variant(request, variant_id):
     return redirect("variant")
 
 
+
+#variants listing
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def variant_management(request):
     # Fetch all products from the database
     products = Products.objects.all()
@@ -251,6 +266,8 @@ def variant_management(request):
     return render(request, "admin_auth/variant_management.html", context)
 
 
+#add variant 
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def add_variant(request, product_id):
     if request.method == "POST":
         price = request.POST.get("price")
@@ -283,6 +300,8 @@ def add_variant(request, product_id):
     return render(request, "admin_auth/add_variant.html", {"product_id": product_id})
 
 
+# listing variants
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def show_variants(request, product_id):
     product = Products.objects.get(pk=product_id)
     variants = ProductVariant.objects.filter(product_id=product_id)
@@ -292,7 +311,8 @@ def show_variants(request, product_id):
         {"product": product, "variants": variants},
     )
 
-
+# Block Variant View
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def block_variant(request, variant_id):
     variant = ProductVariant.objects.get(pk=variant_id)
     variant.is_active = False
@@ -300,6 +320,9 @@ def block_variant(request, variant_id):
     return redirect("show_variants")
 
 
+
+# delete Variant View
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def delete_variant(request, variant_id):
     variant = get_object_or_404(ProductVariant, pk=variant_id)
     product_id = variant.product_id

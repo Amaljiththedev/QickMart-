@@ -346,7 +346,7 @@ def admin_logout(request):
         request.session.flush()
     return redirect("admin_login")
 
-
+# ----------------------------------------------------------------sales filtering based on month and year --------------------------------
 def filter_sales(request):
     time_interval = request.GET.get("time_interval", "all")
 
@@ -387,6 +387,7 @@ def filter_sales(request):
     return JsonResponse({"labels": filtered_labels, "data": filtered_data})
 
 
+#----------------------------------------------------------------pdf report generator docs specification----------------------------------------------------------------
 def report_generator(request, orders):
     from_date_str = request.POST.get("from_date")
     to_date_str = request.POST.get("to_date")
@@ -458,6 +459,8 @@ def report_generator(request, orders):
     return FileResponse(buf, content_type="application/pdf")
 
 
+
+# ----------------------------------------------------------------pdf generator based on the dates----------------------------------------------------------------
 def report_pdf_order(request):
     if request.method == "POST":
         from_date_str = request.POST.get("from_date")

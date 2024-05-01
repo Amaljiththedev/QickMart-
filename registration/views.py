@@ -9,7 +9,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache, cache_control
 
 
-# Create your views here.
+# User registration view
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def register(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -97,10 +98,14 @@ def register(request):
     return render(request, "registration/register.html")
 
 
+# otp number generator
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def generate_otp(length=6):
     return "".join(secrets.choice("0123456789") for i in range(length))
 
 
+# User login view
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def user_login(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -122,16 +127,15 @@ def user_login(request):
 
     return render(request, "registration/login.html")
 
-
+# Forget password view
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def forget(request):
     return render(request, "registration/forget.html")
 
 
-def generate_otp(length=6):
-    return "".join(secrets.choice("0123456789") for i in range(length))
 
-
-@never_cache
+## OTP verification view
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------@never_cache
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def verify_otp(request):
     context = {"messages": messages.get_messages(request)}
@@ -161,14 +165,16 @@ def verify_otp(request):
             return redirect("login")
     return render(request, "registration/verify.html", context)
 
-
+#user logout
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @login_required
 def logout_view(request):
     logout(request)
     messages.info(request, "You have been logged out.")
     return redirect("home")
 
-
+# Cancel registration view
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def cancel_view(request):
 
     user = CustomUser.objects.get(email=request.session["email"])
