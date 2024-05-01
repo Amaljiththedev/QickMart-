@@ -21,8 +21,7 @@ urlpatterns = [
     path(
         "update_cart_quantity/", views.update_cart_quantity, name="update_cart_quantity"
     ),
-    path('variant_add_to_cart/', views.variant_add_to_cart, name='variant_add_to_cart'),
-
+    path("variant_add_to_cart/", views.variant_add_to_cart, name="variant_add_to_cart"),
     path("cart/", views.show_cart, name="show_cart"),
     path("remove_cart/<int:id>/", views.remove_cart, name="remove_cart"),
     path("checkout/", views.checkout, name="checkout"),
@@ -43,5 +42,9 @@ urlpatterns = [
     ),
     path("change_password/", views.reset_password, name="reset_passwords"),
     path("razorpay/callback/", views.razorpay_callback, name="razorpay_callback"),
-    path('download_invoice/<int:order_id>', views.download_invoice, name='download_invoice'),
+    path(
+        "download_invoice/<int:order_id>",
+        views.download_invoice,
+        name="download_invoice",
+    ),
 ]

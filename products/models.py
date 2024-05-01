@@ -19,7 +19,7 @@ class Products(models.Model):
     offer_price = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        validators=[MinValueValidator(0), MaxValueValidator(100)]
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
     )
     brand = models.ForeignKey(
         Brand, related_name="Brand_name", on_delete=models.CASCADE
@@ -37,7 +37,9 @@ class Products(models.Model):
     variants = models.ManyToManyField(
         "ProductVariant", related_name="products", blank=True
     )
-    actual_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    actual_price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
 
     def __str__(self):
         return self.title

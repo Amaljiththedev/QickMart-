@@ -84,17 +84,16 @@ def dashboard(request):
             total_orders=Count("orderitem__order")
         ).order_by("-total_orders")[:10]
 
-        top_brands = Brand.objects.annotate(
-            total_orders=Count('brand_name')
-            ).order_by('-total_orders')[:10]
-        
-        top_categories = category.objects.annotate(
-            total_orders=Count('category_name')
-            ).order_by('-total_orders')[:10]
+        top_brands = Brand.objects.annotate(total_orders=Count("brand_name")).order_by(
+            "-total_orders"
+        )[:10]
 
+        top_categories = category.objects.annotate(
+            total_orders=Count("category_name")
+        ).order_by("-total_orders")[:10]
 
         monthly_revenue = (
-            Order.objects.filter(paid=True or status=="Delivered")
+            Order.objects.filter(paid=True or status == "Delivered")
             .annotate(month=TruncMonth("created_at"))
             .values("month")
             .annotate(total_revenue=Sum("total_price"))
@@ -102,7 +101,7 @@ def dashboard(request):
         filtered_orders = None
         # Yearly Revenue
         yearly_revenue = (
-            Order.objects.filter(paid=True or status=="Delivered")
+            Order.objects.filter(paid=True or status == "Delivered")
             .annotate(year=TruncYear("created_at"))
             .values("year")
             .annotate(total_revenue=Sum("total_price"))
@@ -134,7 +133,9 @@ def dashboard(request):
 
         total_amount_received //= 1000
 
-        order_details_last_week = Order.objects.filter(paid=True,created_at__gte=one_week_ago)
+        order_details_last_week = Order.objects.filter(
+            paid=True, created_at__gte=one_week_ago
+        )
 
         order_details_last_week = order_details_last_week.count()
         # Calculate the total offer price for order details from last week
@@ -168,12 +169,12 @@ def dashboard(request):
                 total_amount=Sum("offer_price")
             )
         monthly_sales = (
-                Order.objects.filter(paid=True)  # Add your filter condition here
-                .annotate(month=TruncMonth("created_at"))
-                .values("month")
-                .annotate(total_amount=Sum("total_price"))
-                .order_by("month")
-            )
+            Order.objects.filter(paid=True)  # Add your filter condition here
+            .annotate(month=TruncMonth("created_at"))
+            .values("month")
+            .annotate(total_amount=Sum("total_price"))
+            .order_by("month")
+        )
         monthly_labels = [entry["month"].strftime("%B %Y") for entry in monthly_sales]
         monthly_data = [float(entry["total_amount"]) for entry in monthly_sales]
         monthly_data = [float(entry["total_amount"]) for entry in monthly_sales]
@@ -226,8 +227,8 @@ def dashboard(request):
             "category_data": json.dumps(category_data),
             "monthly_labels": json.dumps(monthly_labels),
             "monthly_data": json.dumps(monthly_data),
-            "top_categories":top_categories,
-            "top_brands":top_brands,
+            "top_categories": top_categories,
+            "top_brands": top_brands,
         }
 
         if request.method == "GET":
@@ -346,6 +347,7 @@ def admin_logout(request):
         request.session.flush()
     return redirect("admin_login")
 
+
 # ----------------------------------------------------------------sales filtering based on month and year --------------------------------
 def filter_sales(request):
     time_interval = request.GET.get("time_interval", "all")
@@ -387,7 +389,7 @@ def filter_sales(request):
     return JsonResponse({"labels": filtered_labels, "data": filtered_data})
 
 
-#----------------------------------------------------------------pdf report generator docs specification----------------------------------------------------------------
+# ----------------------------------------------------------------pdf report generator docs specification----------------------------------------------------------------
 def report_generator(request, orders):
     from_date_str = request.POST.get("from_date")
     to_date_str = request.POST.get("to_date")
@@ -457,7 +459,6 @@ def report_generator(request, orders):
 
     buf.seek(0)
     return FileResponse(buf, content_type="application/pdf")
-
 
 
 # ----------------------------------------------------------------pdf generator based on the dates----------------------------------------------------------------

@@ -9,9 +9,8 @@ from decimal import Decimal
 from .models import Products, Category, Brand, ProductImage
 
 
-
 # # Product List View
-#--------------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 def product_view(request):
     if "email" in request.session:
         products = Products.objects.all()
@@ -20,9 +19,8 @@ def product_view(request):
     return render(request, "admin_auth/authentication-login.html")
 
 
-
 # Add Product View
-#--------------------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 def add_product(request):
     if "email" in request.session:
         status_choices = Products.Status_choices  # Use the model's choices
@@ -47,7 +45,9 @@ def add_product(request):
             stock_count = int(request.POST.get("stock_count"))
             image = request.FILES.get("image")
             weight = Decimal(request.POST.get("weight"))
-            height = Decimal(request.POST.get("dimensions"))  # Assuming height corresponds to dimensions
+            height = Decimal(
+                request.POST.get("dimensions")
+            )  # Assuming height corresponds to dimensions
             trending = request.POST.get("trending") == "on"
             product_details = request.POST.get("product_details")
 
@@ -78,11 +78,8 @@ def add_product(request):
                 trending=trending,
                 product_details=product_details,
                 offer_price=offer_price,
-                actual_price= price # Assign actual_price directly
+                actual_price=price,  # Assign actual_price directly
             )
-
-
-
 
             if request.FILES.getlist("images"):
                 for img in request.FILES.getlist("images"):
@@ -96,7 +93,7 @@ def add_product(request):
 
 
 # Update Product View
-#------------------------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------------
 def update_product(request, id):
     if "email" in request.session:
         # Retrieve the product object to be updated
@@ -153,7 +150,6 @@ def update_product(request, id):
             product.offer_price = offer_price
             product.actual_price = price
 
-
             # Save the updated product
             product.save()
 
@@ -168,13 +164,12 @@ def update_product(request, id):
         # Render the product update form with the context data
         return render(request, "admin_auth/product_update.html", context)
 
-
     # If user is not logged in, redirect to the login page
     return render(request, "admin_auth/authentication-login.html")
 
 
 # Block Product View
-#-------------------------------------------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------------------------------------------
 def block_product(request, id):
     if "email" in request.session:
         product = Products.objects.get(id=id)
@@ -183,8 +178,9 @@ def block_product(request, id):
         return redirect("product_management")
     return render(request, "admin_auth/authentication-login.html")
 
-#unblock product
-#------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# unblock product
+# ------------------------------------------------------------------------------------------------------------------------------------------------------
 def unblock_product(request, id):
     if "email" in request.session:
         product = Products.objects.get(id=id)
@@ -193,8 +189,9 @@ def unblock_product(request, id):
         return redirect("product_management")
     return render(request, "admin_auth/authentication-login.html")
 
-#delete product
-#---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# delete product
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------
 def delete_product(request, id):
     if "email" in request.session:
         product = Products.objects.get(id=id)
@@ -203,8 +200,9 @@ def delete_product(request, id):
         return redirect("product_management")
     return render(request, "admin_auth/authentication-login.html")
 
-#edit variant 
-#--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# edit variant
+# --------------------------------------------------------------------------------------------------------------------------------------------------------
 def edit_variant(request, variant_id):
     variant_product = get_object_or_404(ProductVariant, id=variant_id)
 
@@ -228,17 +226,18 @@ def edit_variant(request, variant_id):
             "admin_auth/edit_variant.html",
             {"variant_product": variant_product},
         )
+
+
 # Delete Variant View
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def delete_variant(request, variant_id):
     variant_product = get_object_or_404(ProductVariant, id=variant_id)
     variant_product.delete()
     return redirect("variant")  # Redirect to product detail page
 
 
-
 # block_variant
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def block_variant(request, variant_id):
     variant_product = get_object_or_404(ProductVariant, id=variant_id)
 
@@ -247,8 +246,8 @@ def block_variant(request, variant_id):
     return redirect("variant")  # Redirect to product detail page
 
 
-#unblock variant
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# unblock variant
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def unblock_variant(request, variant_id):
     variant_product = get_object_or_404(ProductVariant, id=variant_id)
     variant_product.is_active = True
@@ -256,9 +255,8 @@ def unblock_variant(request, variant_id):
     return redirect("variant")
 
 
-
-#variants listing
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# variants listing
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def variant_management(request):
     # Fetch all products from the database
     products = Products.objects.all()
@@ -266,8 +264,8 @@ def variant_management(request):
     return render(request, "admin_auth/variant_management.html", context)
 
 
-#add variant 
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# add variant
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def add_variant(request, product_id):
     if request.method == "POST":
         price = request.POST.get("price")
@@ -301,7 +299,7 @@ def add_variant(request, product_id):
 
 
 # listing variants
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def show_variants(request, product_id):
     product = Products.objects.get(pk=product_id)
     variants = ProductVariant.objects.filter(product_id=product_id)
@@ -311,8 +309,9 @@ def show_variants(request, product_id):
         {"product": product, "variants": variants},
     )
 
+
 # Block Variant View
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def block_variant(request, variant_id):
     variant = ProductVariant.objects.get(pk=variant_id)
     variant.is_active = False
@@ -320,9 +319,8 @@ def block_variant(request, variant_id):
     return redirect("show_variants")
 
 
-
 # delete Variant View
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def delete_variant(request, variant_id):
     variant = get_object_or_404(ProductVariant, pk=variant_id)
     product_id = variant.product_id

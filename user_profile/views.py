@@ -32,7 +32,7 @@ from xhtml2pdf import pisa
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle,Spacer
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer
 from reportlab.lib.units import inch
 from reportlab.lib.enums import TA_CENTER
 import razorpay
@@ -55,6 +55,7 @@ def account_page(request):
         return render(request, "user_auth/account_page.html", context)
     else:
         return render("user_auth/main.html")
+
 
 # View Function for Managing Profile
 # ---------------------------------------------------------------------------------------------------------------------------
@@ -80,6 +81,7 @@ def manage_profile(request):
 
     context = {"custom_user": custom_user}
     return render(request, "user_auth/profile_manage.html", context)
+
 
 # View Function for Verifying OTP
 # ---------------------------------------------------------------------------------------------------------------------------
@@ -202,14 +204,11 @@ def delete_address(request, address_id):
     return redirect("user_profile:manage_address")
 
 
-
-
 # View Function for Order Page
 # ---------------------------------------------------------------------------------------------------------------------------
 @login_required
 def order_page(request):
     return render(request, "user_auth/orders.html")
-
 
 
 # View Function for Adding to Cart
@@ -223,13 +222,12 @@ def add_to_cart(request):
         product_id = request.POST.get("product_id")
         quantity = request.POST.get("quantity", 1)
 
-
-
         try:
             product = get_object_or_404(Products, id=product_id)
-            wishlist_items = UserWishlist.objects.filter(user=request.user, product=product)
+            wishlist_items = UserWishlist.objects.filter(
+                user=request.user, product=product
+            )
             wishlist_items.delete()
-
 
             if product.stock_count <= 0:
                 return JsonResponse({"error": "Product is out of stock."}, status=400)
@@ -301,7 +299,6 @@ def update_cart_quantity(request):
         return JsonResponse({"error": "Internal server error."}, status=500)
 
 
-
 # View Function for Displaying Cart
 # ---------------------------------------------------------------------------------------------------------------------------
 @login_required
@@ -330,7 +327,9 @@ def show_cart(request):
             elif coupon.discount_type == "fixed_amount":
                 Coupon_discount = coupon.discount_value
         except Coupon.DoesNotExist:
-            messages.error(request, "Invalid coupon code. Please enter a valid coupon code.")
+            messages.error(
+                request, "Invalid coupon code. Please enter a valid coupon code."
+            )
 
         for item in cart_items:
             item.coupon_discount_amount = Coupon_discount
@@ -341,7 +340,6 @@ def show_cart(request):
             item.product.price * item.product_quantity - item.coupon_discount_amount
         )
         item.save()
-
 
     # Pass the cart items, total price, and coupon code to the template as context
     context = {
@@ -357,6 +355,7 @@ def show_cart(request):
 
 # View Function for Removing Item from Cart
 # ---------------------------------------------------------------------------------------------------------------------------
+
 
 @login_required
 def cart_items_count(request):
@@ -378,7 +377,6 @@ def remove_cart(request, id):
 
     cart_item.delete()
     return redirect("user_profile:show_cart")
-
 
 
 # View Function for Confirming Orders
@@ -404,16 +402,17 @@ def checkout(request):
             item.product.price * item.product_quantity - item.coupon_discount_amount
         )
         total_amount += item.total_price
-    
+
     context = {
         "addresses": addresses,
         "cart": cart,
         "payment_modes": payment_modes,
-        "total_amount": total_amount+50,
+        "total_amount": total_amount + 50,
     }
 
     # Render the checkout template with the context
     return render(request, "user_auth/checkoutpage.html", context)
+
 
 @login_required
 def confirm_orders(request):
@@ -518,7 +517,6 @@ def user_orders(request):
     return render(request, "user_auth/user_orders.html", context)
 
 
-
 # View Function for Cancelling Order
 # ---------------------------------------------------------------------------------------------------------------------------
 @login_required
@@ -562,10 +560,9 @@ def track_order(request):
     return render(request, "user_auth/track_order.html", context)
 
 
-
-
 # View Function for Wallet Payment
 # ---------------------------------------------------------------------------------------------------------------------------
+
 
 @login_required
 def wallet_payment(request, order_id):
@@ -589,7 +586,6 @@ def wallet_payment(request, order_id):
             # Update stock count
             product.save()
 
-
         if wallet_balance >= total_price > 0:
             with transaction.atomic():
                 user_profile.wallet_balance -= total_price
@@ -601,7 +597,7 @@ def wallet_payment(request, order_id):
                 return redirect("user_profile:order_confirmation", order_id=order.id)
         else:
             order.paid = False
-            order.status = "Payment pending" 
+            order.status = "Payment pending"
             order.save()
             messages.error(request, "Insufficient funds in wallet. Payment failed.")
             return redirect("user_profile:wallet_payment", order_id=order.id)
@@ -612,7 +608,6 @@ def wallet_payment(request, order_id):
         "wallet_balance": user_profile.wallet_balance,
     }
     return render(request, "user_auth/wallet_payment.html", context)
-
 
 
 # View Function for Displaying Wishlist
@@ -651,7 +646,6 @@ def user_add_to_wishlist(request):
     )
 
 
-
 # View Function for Removing Item from Wishlist
 # ---------------------------------------------------------------------------------------------------------------------------
 @login_required
@@ -664,6 +658,7 @@ def remove_from_wishlist(request, id):
 
 # View Function for Order Details
 # ---------------------------------------------------------------------------------------------------------------------------
+
 
 @login_required
 def order_details(request, order_id):
@@ -695,7 +690,6 @@ def order_details(request, order_id):
     return render(request, "user_auth/track_order.html", context)
 
 
-
 # View Function for Resetting Password
 # ---------------------------------------------------------------------------------------------------------------------------
 @login_required
@@ -704,13 +698,13 @@ def reset_password(request):
         logout(request)
         return redirect("forget_password")
     else:
-        messages.info(request, 'Please log in to access this page.')
+        messages.info(request, "Please log in to access this page.")
         return render(request, "user_auth/reset_password.html")
-
 
 
 # View Function for Razorpay Callback
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 @csrf_exempt
 @login_required
@@ -726,7 +720,7 @@ def razorpay_callback(request):
                     total_price=total_price,
                     payment_method="Razorpay",
                     paid=True,  # Assume payment is successful initially
-                    razorpay_order_id=data.get('razorpay_payment_id'),
+                    razorpay_order_id=data.get("razorpay_payment_id"),
                 )
                 for cart_item in cart_items:
                     OrderItem.objects.create(
@@ -739,8 +733,8 @@ def razorpay_callback(request):
                 product = item.product
                 quantity = item.product_quantity
                 product.stock_count -= quantity
-                
-            # Update stock count
+
+                # Update stock count
                 product.save()
             cart_items.delete()
             return render(
@@ -749,38 +743,33 @@ def razorpay_callback(request):
             )
         except Exception as e:
             if order:
-                order.paid = False 
-                order.status="Payment pending"
+                order.paid = False
+                order.status = "Payment pending"
                 order.save()
-            return JsonResponse(
-                {"status": "error", "message": str(e)}, status=500
-            )
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
     else:
         return JsonResponse(
             {"status": "error", "message": "Only POST method is allowed"}, status=405
         )
-    
 
 
 # View Function for Downloading Invoice
-# --------------------------------------------------------------------------------------------------------------------------------------------------------------------    
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @login_required
 def download_invoice(request, order_id):
     order = Order.objects.get(id=order_id)
-    template_path = 'user_auth/pdf.html'
-    context = {'order': order}
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    template_path = "user_auth/pdf.html"
+    context = {"order": order}
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="report.pdf"'
     template = get_template(template_path)
     html = template.render(context)
 
-    pisa_status = pisa.CreatePDF(
-       html, dest=response)
+    pisa_status = pisa.CreatePDF(html, dest=response)
     if pisa_status.err:
-       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+        return HttpResponse("We had some errors <pre>" + html + "</pre>")
 
     return response
-
 
 
 # View Function for Adding Variant to Cart---------------------------------------------------------------------------------------------------------------------------
@@ -792,7 +781,9 @@ def variant_add_to_cart(request):
         variant_id = request.POST.get("variant_id")
         quantity = request.POST.get("quantity", 1)
         if not product_id or not variant_id:
-            return JsonResponse({"error": "Product ID or Variant ID is missing."}, status=400)
+            return JsonResponse(
+                {"error": "Product ID or Variant ID is missing."}, status=400
+            )
         variant = get_object_or_404(ProductVariant, id=variant_id)
         product = variant.product
         variant_image = VariantImage.objects.filter(variant=variant).first()

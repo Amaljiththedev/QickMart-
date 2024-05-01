@@ -2,7 +2,6 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
-
 # Create your models here.
 class category(models.Model):
     name = models.CharField(max_length=255, blank=False, null=True, unique=True)
@@ -12,7 +11,7 @@ class category(models.Model):
     category_offer = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        validators=[MinValueValidator(0), MaxValueValidator(100)]
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
     )
     is_active = models.BooleanField(default=True)
 

@@ -24,7 +24,9 @@ class Cart(models.Model):
     product = models.ForeignKey(
         Products, on_delete=models.CASCADE, null=True, blank=True
     )
-    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, null=True, blank=True)  # Add this line
+    variant = models.ForeignKey(
+        ProductVariant, on_delete=models.CASCADE, null=True, blank=True
+    )  # Add this line
 
     product_quantity = models.IntegerField(default=1, null=True, blank=False)
     created_date = models.DateField(default=timezone.now)
@@ -81,8 +83,6 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
 
-
-
 class UserWishlist(models.Model):
     user = models.ForeignKey(
         CustomUser, related_name="customerswishlist", on_delete=models.CASCADE
@@ -91,5 +91,3 @@ class UserWishlist(models.Model):
         Products, related_name="wishlistproducts", on_delete=models.CASCADE
     )
     created_at = models.DateTimeField(auto_now_add=True)
-
-
